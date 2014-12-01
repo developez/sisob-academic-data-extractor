@@ -3,9 +3,9 @@ SISOB ACADEMIC DATA EXTRACTOR
 
 This project is a fork of SISOB DATA EXTRACTOR, one of the results of the SISOB project (http://sisob.lcc.uma.es). The SISOB project was supported by the European Commission, call FP7-SCIENCE-IN-SOCIETY-2010-1, as a Collaborative Project under the 7th Framework Program, Grant agreement number 266588. SISOB Data Extractor has been development by the (IA)2 Research Group (http://iaia.lcc.uma.es) at the University of Málaga (Spain) (http://www.uma.es) in collaboration with the Fondazione Roselli (http://www.personalweb.unito.it/aldo.geuna/).
 
-I, as the main developer of the "SISOB DATA EXTRACTOR" under directions by my chiefs while I was working for the University of Málaga in the (IA)2 Researcher Group as researcher, I make this fork to maintain my own version of the project with more documentation and functionalities, and also to show code developed in my job.
+I, as the main developer of the "SISOB DATA EXTRACTOR" under directions by my chiefs while I was working for the University of Málaga in the (IA)2 Researcher Group as researcher, I make this fork to maintain my own version of the project with more documentation and functionalities, and also to show code developed for job opportunities.
 
-Contact: dlopezgonzalez@gmail.com
+Contact: dlopezgonzalez@gmail.com . Daniel López González, software developer.
 
 INFORMATION AND INSTRUCTIONS
 ============================
@@ -26,7 +26,7 @@ Index:
 2. Directory structure of the project
 -------------------------------------
 
-	data-extractor-server	(rest server projects)
+	data-extractor-server	                (rest server projects)
 	|
 	|_	data-extractor-rest-server	(main project) 
 	|_	data-extractor-rest-server-communications	
@@ -54,9 +54,9 @@ Index:
 	|_	api-prototypeTextMiningGate
 	|_	api-threadpoolutils
 		
-	|_pom.xml - pom file of parent proyect (sisob-data-extractor)
+	|_pom.xml - pom file of parent proyect   (sisob-data-extractor)
 	
-The main project that deploy the application is "data-extractor-rest-server". 
+The main project deploys the web application "data-extractor-rest-server". 
 This project generates the WAR file to be installed in the application server (glassfish or tomcat).
 
 3. Instructions to build and install the SISOB Data Extractor
@@ -90,4 +90,4 @@ This project generates the WAR file to be installed in the application server (g
 
 - Deploy the war in the application server. 
 
-Cheers!
+Enjoy!
