@@ -1,0 +1,151 @@
+﻿Phase: telephone
+Input: Token SpaceToken
+Options: control = appelt
+debug = true
+Macro: SPACE
+(
+	(
+	{SpaceToken.kind == space}
+	)*
+)
+
+Macro: TLF
+(
+	(
+	{Token.string == "TLF"} |
+	{Token.string == "tlf"} |
+	{Token.string == "Tlf"} |
+	{Token.string == "Teléfono"} |
+	{Token.string == "Telefono"} |
+	{Token.string == "teléfono"} |
+	{Token.string == "telefono"} |
+	{Token.string == "Tel."} 	
+	)
+	({Token.kind == punctuation})?
+)
+
+Rule:MakeTelephone9
+priority:20
+(
+	(
+	(TLF)
+	(SPACE)
+	)
+	(
+		(
+		{Token.string == "+"}
+		{Token.kind == number, Token.length == "2"}
+		{SpaceToken.kind == space}
+		)?
+		(
+			{Token.kind == number, Token.length == "2"}
+			({SpaceToken.kind == space})?
+			{Token.kind == number, Token.length == "7"}
+		)	
+	):Telephone
+)
+-->
+:Telephone.TelephoneResearcher = {rule="MakeTelephone0", kind = TelephoneResearcher}
+
+
+Rule:MakeTelephone0
+priority:20
+(
+	(
+	(TLF)
+	(SPACE)
+	)
+	(
+		(
+		{Token.string == "+"}
+		{Token.kind == number, Token.length == "2"}
+		{SpaceToken.kind == space}
+		)?
+		(
+			{Token.kind == number, Token.length == "3"}
+			(
+				(
+				 {SpaceToken.kind == space}
+				)?
+				{Token.kind == punctuation}
+			)?
+			(
+				{SpaceToken.kind == space}
+			)?
+			{Token.kind == number, Token.length == "3"}
+			{SpaceToken.kind == space}
+			{Token.kind == number, Token.length == "3"}		
+		)	
+	):Telephone
+)
+-->
+:Telephone.TelephoneResearcher = {rule="MakeTelephone0", kind = TelephoneResearcher}
+
+Rule:MakeTelephone2
+priority:20
+(
+	(
+	(TLF)
+	(SPACE)
+	)
+	(
+		(
+			{Token.string == "+"}
+			{Token.kind == number, Token.length == "2"}
+			{SpaceToken.kind == space}
+		)?
+		(
+			{Token.kind == number, Token.length == "9"}		
+		)
+	):Telephone
+)
+-->
+:Telephone.TelephoneResearcher = {rule="MakeTelephone2", kind = TelephoneResearcher}
+
+Rule:MakeTelephone3
+priority:20
+(
+	(
+	(TLF)
+	(SPACE)
+	)
+	(
+		{Token.kind == number, Token.length == "4"}		
+	):Telephone
+)
+-->
+:Telephone.TelephoneResearcher = {rule="MakeTelephone3", kind = TelephoneResearcher}
+
+
+Rule:MakeTelephone4
+priority:20
+(
+	(
+	(TLF)
+	(SPACE)
+	)
+	(
+		(
+		{Token.string == "+"}
+		{Token.kind == number, Token.length == "2"}
+		{SpaceToken.kind == space}
+		)?
+		(
+			{Token.kind == number, Token.length == "2"}
+			(
+				(
+				 {SpaceToken.kind == space}
+				)?
+				{Token.kind == punctuation}
+			)?
+			(
+				{SpaceToken.kind == space}
+			)?
+			{Token.kind == number, Token.length == "3"}
+			{SpaceToken.kind == space}
+			{Token.kind == number, Token.length == "4"}		
+		)	
+	):Telephone
+)
+-->
+:Telephone.TelephoneResearcher = {rule="MakeTelephone4", kind = TelephoneResearcher}

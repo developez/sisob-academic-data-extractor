@@ -1,0 +1,3 @@
+jms-1.1.jar
+jmsxri-1.2.1.jar
+jmxtools-1.2.1

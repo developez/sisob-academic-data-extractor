@@ -1,0 +1,748 @@
+
+		/*
+Rule: MakeCvPrefix
+priority:30
+(	
+	(NEW_LINE)	
+	(CV_PREFIX)	:varName 
+)
+-->
+:varName.CV_Prefix = {rule="MakeCvPrefix"}
+
+Rule: MakeGeneralPrefix
+priority:5
+(	
+	(NEW_LINE)
+	(GENERAL_PREFIX)	:varName 
+)
+-->
+:varName.General_Prefix = {rule="MakeGeneralPrefix", kind=GeneralPrefix}
+*/
+
+
+
+
+
+/*
+
+Rule: Acade
+priority:200
+(	
+	(
+	 (DATAOFCAREERSTATION)
+	 )	:varName 
+	
+)
+-->
+:varName.DataCarrerr = {rule="Acade"}
+
+*/
+
+
+
+/*
+Rule: CarrerStations
+priority:200
+(	
+	{SpaceToken.kind == control} 
+	(({SpaceToken.kind == space})+)?
+	((DATAOFCAREERSTATION):varCareerStation)
+	(({SpaceToken.kind == space})+) ?						
+	(	
+		(		
+			({SpaceToken.kind == space})*
+			((ACADEMIC_DEGREE):varResearcherDegree)?			
+			((ACADEMIC_JOB):varResearcherJob)?			
+			((INTERESTED_ORGS) : varResearcherJobOrg)?
+			(({Location}):varResearcherLoc)?			
+			({Token.kind == punctuation})?
+			({Token.kind == word})?						
+		)				
+	)+		
+):varResearcherExp
+-->
+{	
+	gate.AnnotationSet varResearcherExpr = (gate.AnnotationSet)bindings.get("varResearcherExp");		
+	gate.AnnotationSet varCareerStation = (gate.AnnotationSet)bindings.get("varCareerStation");		
+	gate.AnnotationSet varResearcherJob = (gate.AnnotationSet)bindings.get("varResearcherJob");		
+	gate.AnnotationSet varResearcherJobOrg = (gate.AnnotationSet)bindings.get("varResearcherJobOrg");	
+	gate.AnnotationSet varResearcherDegree = (gate.AnnotationSet)bindings.get("varResearcherDegree");		
+	gate.AnnotationSet varResearcherLoc = (gate.AnnotationSet)bindings.get("varResearcherLoc");			
+	
+	if(varResearcherExpr != null)	
+	{
+		try
+		{			
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","CarrerStations"); 
+			outputAS.add(varResearcherExpr.firstNode(), varResearcherExpr.lastNode(), "ExpressionResearcherCT", features);		
+		}
+		catch(Exception ex)
+		{
+			System.out.println("Exception: " + ex.getMessage());
+		}		
+	}
+	
+	if(varResearcherDegree != null ||
+	   varResearcherJob != null ||
+	   varResearcherJobOrg != null ||
+	   varResearcherLoc != null)
+	{	
+		if(varCareerStation != null)
+		for (gate.Annotation varAnn : varCareerStation) 
+		{
+			
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","CarrerStations"); 
+			try
+			{
+				outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), "ResearcherDateCT", features);
+			}
+			catch(Exception ex)
+			{
+				System.out.println("Exception: " + ex.getMessage());
+			}			
+		}	
+		
+		if(varResearcherJob != null)
+		for (gate.Annotation varAnn : varResearcherJob) 
+		{	
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","CarrerStations"); 
+			try
+			{
+				outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), "ResearcherJobCT", features);
+			}
+			catch(Exception ex)
+			{
+				System.out.println("Exception: " + ex.getMessage());
+			}			
+		}	
+			
+		if(varResearcherJobOrg != null)
+		for (gate.Annotation varAnn : varResearcherJobOrg) 
+		{
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","CarrerStations"); 
+			try
+			{
+				outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), "ResearcherJobOrgCT", features);
+			}
+			catch(Exception ex)
+			{
+				System.out.println("Exception: " + ex.getMessage());
+			}			
+		}	
+			
+		if(varResearcherDegree != null)
+		for (gate.Annotation varAnn : varResearcherDegree) 
+		{
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","CarrerStations"); 
+			try
+			{
+				outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), "ResearcherDegreeCT", features);
+			}
+			catch(Exception ex)
+			{
+				System.out.println("Exception: " + ex.getMessage());
+			}			
+		}	
+		
+		if(varResearcherLoc != null)
+		for (gate.Annotation varAnn : varResearcherLoc) 
+		{
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","CarrerStations"); 
+			try
+			{
+				outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), "ResearcherLocCT", features);
+			}
+			catch(Exception ex)
+			{
+				System.out.println("Exception: " + ex.getMessage());
+			}			
+		}		
+	}	
+}
+
+
+
+/*
+Rule: ShowOrgFinal
+priority:20
+(   
+   ({Organization.rule1=="BaseofOrg"}):varName 
+)
+-->
+:varName.OrganizationFinal = {rule = "ShowOrgFinal"}
+
+
+Rule: TAL
+priority:20
+(	
+	(
+		(
+			(
+			{Token.string == "since"} | 
+			{Token.string == "Since"}
+			)
+			{SpaceToken.kind == space}		 
+		) ?
+		({Date}) :varDate
+		({SpaceToken.kind == space})*
+		({SpaceToken.kind == control})?		
+		({Token.kind == word} {SpaceToken.kind == space})+
+		({Organization})? :varOrg
+	)
+) : varALL
+-->
+:varDate.ResearcherDate = {rule="TALI"}, 
+:varOrg.ResearcherOrg = {rule="TALI"},
+:varALL.ResearcherALL = {rule="TALI"}
+
+
+
+
+Rule:MakeResearcherOrg
+priority:20
+(	
+	({Organization.rule == OrgFinal})
+	:varPub
+)
+-->
+:varPub.ResearcherOrg = {rule="MakeResearcherOrg", kind = ResearcherOrg}
+
+
+Rule:MakeResearcherJobs
+priority:10
+(	
+	({Lookup.majorType == jobtitle, Lookup.minorType == academic})
+	:varPub2
+)
+-->
+:varPub2.ResearcherJob = {rule="MakeResearcherJobs", kind = ResearcherJob}
+
+
+*/
+
+
+/*
+Rule: ResearcherJobInThePastPattern2
+(
+	(
+		(PERSONTOWORKVERBPAST)			
+		(
+				({SpaceToken.kind == space})
+				{Token.category == IN, Token.string == as}
+		)
+		(
+			(
+				({SpaceToken.kind == space})
+				{Token.string=="and"}
+			)?							
+			(
+				({SpaceToken.kind == space})
+				{Token.category == DT}
+			)?			
+			(		
+				({SpaceToken.kind == space})
+				({JobTitle}):varResearcherJob
+			)
+			(
+				({SpaceToken.kind == space})			
+				(DATA_IN_BRACKETS) 
+			)?
+			(
+				({SpaceToken.kind == space})
+				{Token.category == IN}
+			)?			
+			(
+				({Token.category == ","})?
+				(
+				({SpaceToken.kind == space})
+				{Token.category == DT} 
+				)?		
+				({SpaceToken.kind == space})		
+				(INTERESTED_ORGS) : varResearcherJobOrg
+				
+			)*		
+		)+
+	):varResearcherExp
+)
+-->
+{
+	gate.AnnotationSet varResearcherJob = (gate.AnnotationSet)bindings.get("varResearcherJob");		
+	
+	if(varResearcherJob != null)
+	for (gate.Annotation varAnn : varResearcherJob) 
+	{
+		gate.FeatureMap features = Factory.newFeatureMap(); 
+		features.put("rule","ResearcherJobInThePastPattern"); 
+		try
+		{
+			outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), "ResearcherJobInThePast", features);
+		}
+		catch(Exception ex)
+		{
+		}
+	}
+	
+	gate.AnnotationSet varResearcherJobOrg = (gate.AnnotationSet)bindings.get("varResearcherJobOrg");		
+	
+	if(varResearcherJobOrg != null)
+	for (gate.Annotation varAnn : varResearcherJobOrg) 
+	{
+		gate.FeatureMap features = Factory.newFeatureMap(); 
+		features.put("rule","ResearcherJobInThePastPattern"); 
+		outputAS.add(varAnn.getStartNode(), varAnn.getEndNode(), "ResearcherJobOrgInThePast", features);
+	}	
+	
+	gate.AnnotationSet varResearcherExpr = (gate.AnnotationSet)bindings.get("varResearcherExp");		
+	
+	if(varResearcherExpr != null)
+	for (gate.Annotation varAnn : varResearcherExpr) 
+	{
+		gate.FeatureMap features = Factory.newFeatureMap(); 
+		features.put("rule","ResearcherJobInThePastPattern2"); 
+		outputAS.add(varAnn.getStartNode(), varAnn.getEndNode(), "ExpresionResearcherJobInThePast2", features);
+	}		
+	
+}
+
+Rule: ResearcherJobInThePastPattern
+(	
+	(	
+		(PERSONTOBEPAST)	
+		(
+			({SpaceToken.kind == space})
+			{Token.category == DT}
+		)?
+		(
+			(
+				({SpaceToken.kind == space})
+				{Token.string=="and"}
+			)?				
+			(		
+				({SpaceToken.kind == space})
+				({JobTitle}):varResearcherJob
+			)		
+			(
+				({SpaceToken.kind == space})
+				{Token.category == IN}
+			)?			
+			(
+				(
+				({SpaceToken.kind == space})
+				{Token.category == DT} 
+				)?		
+				({SpaceToken.kind == space})		
+				(INTERESTED_ORGS) : varResearcherJobOrg
+			)?
+		)+
+	):varResearcherExp
+)
+-->
+{
+	gate.AnnotationSet varResearcherJob = (gate.AnnotationSet)bindings.get("varResearcherJob");		
+	
+	if(varResearcherJob != null)
+	for (gate.Annotation varAnn : varResearcherJob) 
+	{
+		gate.FeatureMap features = Factory.newFeatureMap(); 
+		features.put("rule","ResearcherJobInThePastPattern"); 
+		try
+		{
+			outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), "ResearcherJobInThePast", features);
+		}
+		catch(Exception ex)
+		{
+		}
+	}
+	
+	gate.AnnotationSet varResearcherJobOrg = (gate.AnnotationSet)bindings.get("varResearcherJobOrg");		
+	
+	if(varResearcherJobOrg != null)
+	for (gate.Annotation varAnn : varResearcherJobOrg) 
+	{
+		gate.FeatureMap features = Factory.newFeatureMap(); 
+		features.put("rule","ResearcherJobInThePastPattern"); 
+		outputAS.add(varAnn.getStartNode(), varAnn.getEndNode(), "ResearcherJobOrgInThePast", features);
+	}	
+	
+	gate.AnnotationSet varResearcherExpr = (gate.AnnotationSet)bindings.get("varResearcherExp");		
+	
+	if(varResearcherExpr != null)
+	for (gate.Annotation varAnn : varResearcherExpr) 
+	{
+		gate.FeatureMap features = Factory.newFeatureMap(); 
+		features.put("rule","ResearcherJobInThePastPattern2"); 
+		outputAS.add(varAnn.getStartNode(), varAnn.getEndNode(), "ExpresionResearcherJobInThePast", features);
+	}		
+	
+}
+
+
+Macro: PERSONTOBEPRESENT
+(		
+		({Token.category == PRP} | {Person})
+		({SpaceToken.kind == space})
+		(	
+			({Token.category == VBZ, Token.root == be})
+		)			
+)
+
+Rule: ResearcherPresentPattern
+(	
+	(	
+		(PERSONTOBEPRESENT)	
+		(
+			({SpaceToken.kind == space})
+			{Token.category == DT}
+		)?
+		(
+			(
+				({SpaceToken.kind == space})
+				{Token.string=="and"}
+			)?				
+			(		
+				({SpaceToken.kind == space})
+				({JobTitle}):varResearcherJob
+			)		
+			(
+				({SpaceToken.kind == space})
+				{Token.category == IN}
+			)?			
+			(
+				(
+				({SpaceToken.kind == space})
+				{Token.category == DT} 
+				)?		
+				({SpaceToken.kind == space})		
+				(INTERESTED_ORGS) : varResearcherJobOrg
+			)?
+		)+
+	):varResearcherExp
+)
+-->
+{
+	gate.AnnotationSet varResearcherJob = (gate.AnnotationSet)bindings.get("varResearcherJob");		
+	
+	if(varResearcherJob != null)
+	for (gate.Annotation varAnn : varResearcherJob) 
+	{
+		gate.FeatureMap features = Factory.newFeatureMap(); 
+		features.put("rule","ResearcherJobInThePastPattern"); 
+		outputAS.add(varAnn.getStartNode(), varAnn.getEndNode(), "ResearcherJobPresent", features);
+	}
+	
+	gate.AnnotationSet varResearcherJobOrg = (gate.AnnotationSet)bindings.get("varResearcherJobOrg");		
+	
+	if(varResearcherJobOrg != null)
+	for (gate.Annotation varAnn : varResearcherJobOrg) 
+	{
+		gate.FeatureMap features = Factory.newFeatureMap(); 
+		features.put("rule","ResearcherJobInThePastPattern"); 
+		outputAS.add(varAnn.getStartNode(), varAnn.getEndNode(), "ResearcherJobOrgPresent", features);
+	}	
+	
+	gate.AnnotationSet varResearcherExpr = (gate.AnnotationSet)bindings.get("varResearcherExp");		
+	
+	if(varResearcherExpr != null)
+	for (gate.Annotation varAnn : varResearcherExpr) 
+	{
+		gate.FeatureMap features = Factory.newFeatureMap(); 
+		features.put("rule","ResearcherJobInThePastPattern"); 
+		outputAS.add(varAnn.getStartNode(), varAnn.getEndNode(), "ExpresionResearcherJobPresent", features);
+	}		
+	
+}
+
+Macro: PERSONWASBORN
+(	
+		({Token.category == PRP} | {Person})
+		({SpaceToken.kind == space})
+		(	
+			{Token.category == VBD, Token.root == "be"}	
+			({SpaceToken.kind == space})
+			{Token.category == VBN, Token.root == "bear"}	
+		)					
+)
+
+
+Rule: Test1Pattern
+(	
+	(	
+		(PERSONWASBORN)
+		(
+			({SpaceToken.kind == space})
+			{Token.category == IN}
+		)
+		(
+			({SpaceToken.kind == space})
+			({Token.category == NNP} | {Location})
+		)
+		(			
+			{Token.string==","}
+			({SpaceToken.kind == space})
+			({Token.category == NNP} | {Location})
+		)?
+		(	
+			({Token.string==","})?
+			(
+			({SpaceToken.kind == space})
+			{Token.category == IN}			
+			)?			
+			({SpaceToken.kind == space})
+			{Date}
+		)?		
+		
+	):varVerb
+)
+-->
+:varVerb.Test1 = {rule = "Test1Pattern"}
+
+Rule:MakePublicationTerm
+priority:100
+(	
+	({Lookup.majorType == publication_term})
+	:varPub
+)
+-->
+:varPub.PublicationTerm = {rule = "MakePublicationTerm", kind = "PublicationTerm"}
+
+
+
+
+Rule: Rule0
+priority:500
+(
+	(PERSONTOBEPAST)
+):varPub
+-->
+:varPub.PersonToBePast = {}
+
+Rule: Rule1
+priority:500
+(
+	({JobTitle})
+):varPub
+-->
+:varPub.JobTitle = {}
+
+
+Rule: Rule2
+priority:500
+(
+	DATA_IN_BRACKETS
+):varPub
+-->
+:varPub.DataInBrackets = {}
+
+Rule: Rule3
+priority:500
+(
+	INTERESTED_ORGS
+):varPub
+-->
+:varPub.InterestedOrgs = {}
+
+/*
+
+Rule: ResearcherPastPattern
+(	
+	(	
+		(PERSONTOBEPAST)
+		(
+			(
+				{Token.string==","}
+			)?
+			(			
+				({SpaceToken.kind == space})
+				{Token.string=="and"}			
+			)?										
+			(
+				({SpaceToken.kind == space})
+				{Token.category == DT}
+			)?			
+			(		
+				({SpaceToken.kind == space})
+				({JobTitle}):varResearcherJob				
+			)			
+			(
+				({SpaceToken.kind == space})
+				(DATA_IN_BRACKETS) 
+			)?			
+			(
+				({Token.category == ","})?
+				({SpaceToken.kind == space}) ?
+				({Token.string=="and"})?
+				(
+					({SpaceToken.kind == space})
+					{Token.category == IN}
+				)?							
+				(
+					({SpaceToken.kind == space})
+					{Token.category == DT} 
+				)?		
+				({SpaceToken.kind == space}) ?				
+				(
+					(
+						(INTERESTED_ORGS) : varResearcherJobOrg
+					) 					
+				)				
+			)*						
+		)+
+	)
+):varResearcherExp
+-->
+{
+	gate.AnnotationSet varResearcherJob = (gate.AnnotationSet)bindings.get("varResearcherJob");		
+	
+	if(varResearcherJob != null)
+	for (gate.Annotation varAnn : varResearcherJob) 
+	{
+		gate.FeatureMap features = Factory.newFeatureMap(); 
+		features.put("rule","ResearcherJobInThePastPattern"); 
+		try
+		{
+			outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), "ResearcherJobInThePast", features);
+		}
+		catch(Exception ex)
+		{
+		}
+	}
+	
+	gate.AnnotationSet varResearcherJobOrg = (gate.AnnotationSet)bindings.get("varResearcherJobOrg");		
+	
+	if(varResearcherJobOrg != null)
+	for (gate.Annotation varAnn : varResearcherJobOrg) 
+	{
+		gate.FeatureMap features = Factory.newFeatureMap(); 
+		features.put("rule","ResearcherJobInThePastPattern"); 
+		try
+		{		
+			outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), "ResearcherJobOrgInThePast", features);
+		}
+		catch(Exception ex)
+		{
+		}
+	}	
+	
+	gate.AnnotationSet varResearcherExpr = (gate.AnnotationSet)bindings.get("varResearcherExp");		
+	
+	if(varResearcherExpr != null)
+	try
+	{
+		gate.FeatureMap features = Factory.newFeatureMap(); 
+		features.put("rule","ResearcherPastPattern"); 
+		outputAS.add(varResearcherExpr.firstNode(), varResearcherExpr.lastNode(), "TestJobPast", features);
+	}
+	catch(Exception ex)
+	{
+	}	
+}
+
+*/
+
+/*
+Rule: ResearcherPresentPattern
+(	
+	(	
+		(PERSONTOBEPRESENT)
+		(
+			(
+				{Token.string==","}
+			)?
+			(			    
+				({SpaceToken.kind == space})
+				{Token.string=="and"}
+								
+			)?										
+			
+			(
+				({SpaceToken.kind == space})
+				{Token.category == DT}
+			)?			
+			(		
+				({SpaceToken.kind == space})
+				({JobTitle}):varResearcherJob
+			)
+			(
+				({SpaceToken.kind == space})			
+				(DATA_IN_BRACKETS) 
+			)?			
+			(
+				({Token.category == ","})?
+				({SpaceToken.kind == space}) ?
+				({Token.string=="and"})?
+				(
+					({SpaceToken.kind == space})
+					{Token.category == IN}
+				)?							
+				(
+					({SpaceToken.kind == space})
+					{Token.category == DT} 
+				)?		
+				({SpaceToken.kind == space}) ?				
+				(
+					(
+						(INTERESTED_ORGS) : varResearcherJobOrg
+					)					
+				)		
+				
+			)*		
+		)+
+	)
+):varResearcherExp
+-->
+{
+	gate.AnnotationSet varResearcherJob = (gate.AnnotationSet)bindings.get("varResearcherJob");		
+	
+	if(varResearcherJob != null)
+	for (gate.Annotation varAnn : varResearcherJob) 
+	{
+		gate.FeatureMap features = Factory.newFeatureMap(); 
+		features.put("rule","ResearcherJobInThePresentPattern"); 
+		try
+		{
+			outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), "ResearcherJobInThePast", features);
+		}
+		catch(Exception ex)
+		{
+		}
+	}
+	
+	gate.AnnotationSet varResearcherJobOrg = (gate.AnnotationSet)bindings.get("varResearcherJobOrg");		
+	
+	if(varResearcherJobOrg != null)
+	for (gate.Annotation varAnn : varResearcherJobOrg) 
+	{
+		gate.FeatureMap features = Factory.newFeatureMap(); 
+		features.put("rule","ResearcherJobInThePastPattern"); 
+		try
+		{
+			outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), "ResearcherJobOrgInThePresent", features);
+		}
+		catch(Exception ex)
+		{
+		}			
+	}	
+	
+	gate.AnnotationSet varResearcherExpr = (gate.AnnotationSet)bindings.get("varResearcherExp");		
+	
+	if(varResearcherExpr != null)	
+	try
+	{
+		gate.FeatureMap features = Factory.newFeatureMap(); 
+		features.put("rule","ResearcherPresentPattern"); 
+		outputAS.add(varResearcherExpr.firstNode(), varResearcherExpr.lastNode(), "TestJobPresent", features);
+	}
+	catch(Exception ex)
+	{
+	}		
+}
+
+
+
+

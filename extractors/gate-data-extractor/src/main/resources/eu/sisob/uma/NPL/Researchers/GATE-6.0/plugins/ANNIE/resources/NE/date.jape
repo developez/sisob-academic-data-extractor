@@ -1,0 +1,1445 @@
+﻿/*
+*  time.jape
+*
+* Copyright (c) 1998-2004, The University of Sheffield.
+*
+*  This file is part of GATE (see http://gate.ac.uk/), and is free
+*  software, licenced under the GNU Library General Public License,
+*  Version 2, June 1991 (in the distribution as file licence.html,
+*  and also available at http://gate.ac.uk/gate/licence.html).
+*
+*  Diana Maynard, 10 Sep 2001
+* 
+*  $Id: date.jape 12268 2010-02-16 13:26:12Z markagreenwood $
+*/
+
+Imports: {
+	import java.text.DateFormatSymbols;
+}
+
+Phase:	Time
+Input: Token Lookup
+Options: control = appelt
+
+
+/////////////////////////////////////////////////
+
+Macro: DAY_NAME 
+({Lookup.minorType == day })
+
+Macro: ONE_DIGIT
+({Token.kind == number, Token.length == "1"})
+
+Macro: TWO_DIGIT
+({Token.kind == number, Token.length == "2"})
+
+Macro: FOUR_DIGIT
+({Token.kind == number, Token.length == "4"})
+
+Macro: DAY_MONTH_NUM
+(ONE_DIGIT | TWO_DIGIT)
+
+Macro: DATE_PRE
+// possible modifiers of dates, eg. "early October"
+({Token.string == "early"}|
+ {Token.string == "late"}|
+ {Token.string == "mid"}|
+ {Token.string == "mid-"}|
+ {Token.string == "end"}
+)
+
+Macro: DAY 
+(((DATE_PRE)?
+  DAY_NAME) |
+ DAY_MONTH_NUM)
+
+Macro: MONTH_NAME
+( (DATE_PRE)?
+  {Lookup.minorType == month})
+
+Macro: MONTH 
+(MONTH_NAME | DAY_MONTH_NUM)
+
+Macro: SLASH
+  ({Token.string == "/"})
+  
+Macro: DASH
+  {Token.string == "-"}
+
+Macro: OF
+  {Token.root == "of"}
+
+Macro: AD_BC
+	(  {Token.string == "ad"} | {Token.string == "AD"}
+	|
+	  ({Token.string == "a"} {Token.string == "."}
+	   {Token.string == "d"} {Token.string == "."})
+	|
+	  ({Token.string == "A"} {Token.string == "."}
+	   {Token.string == "D"} {Token.string == "."})
+	|
+
+	  {Token.string == "bc"} | {Token.string == "BC"}
+	|
+	  ({Token.string == "b"} {Token.string == "."}
+	   {Token.string == "c"} {Token.string == "."})
+	 
+	|
+ 	  ({Token.string == "B"} {Token.string == "."}
+	   {Token.string == "C"} {Token.string == "."})
+	)
+
+Macro: YEAR
+(        
+ {Lookup.majorType == year}|
+ TWO_DIGIT | FOUR_DIGIT | 
+ {Token.string == "'"}
+ (TWO_DIGIT)
+)
+
+
+Macro:	XDAY
+(
+ ({Token.orth == upperInitial} |
+  {Token.orth == allCaps})
+ {Token.string == "Day"}
+)
+
+Macro: ORDINAL
+(
+   ({Token.string ==~ "[0-9][0-9]?(th|rd|nd|st)"}
+    |
+   {Lookup.minorType == ordinal})
+   (
+    {Token.root == "of"})?
+)
+
+Macro: NUM_OR_ORDINAL
+  (ORDINAL | DAY_MONTH_NUM)
+
+
+Macro: COMMA
+({Token.string == ","})
+
+
+Macro:  TIME_ZONE
+(({Lookup.minorType == zone})|
+ ({Token.string == "("}
+  {Lookup.minorType == zone}
+  {Token.string == ")"})
+)
+
+Macro: TIME_DIFF
+(
+ ({Token.string == "+"}|{Token.string == "-"})
+ (FOUR_DIGIT)
+)
+
+Macro: TIME_AMPM
+(
+ {Lookup.minorType == ampm}
+)
+
+
+
+
+///////////////////////////////////////////////////////////////
+// Time Rules 
+
+Rule: TimeDigital1
+// 20:14:25
+(
+ (ONE_DIGIT|TWO_DIGIT){Token.string == ":"} TWO_DIGIT 
+({Token.string == ":"} TWO_DIGIT)?
+(TIME_AMPM)?	
+(TIME_DIFF)?
+(TIME_ZONE)? 
+)
+:time
+-->
+:time.TempTime = {kind = "positive", rule = "TimeDigital1"}
+
+
+Rule:	TimeDigital2
+
+// 8:14 am
+// 4.34 pm
+// 6am
+
+(
+ (ONE_DIGIT|TWO_DIGIT) 
+ (({Token.string == ":"}|{Token.string == "."} |{Token.string == "-"} )
+  TWO_DIGIT)?
+ (TIME_AMPM)
+ (TIME_ZONE)?
+)
+:time
+-->
+:time.TempTime = {kind = "positive", rule = "TimeDigital"}
+
+
+Rule: TimeOClock
+// ten o'clock
+
+(
+ {Lookup.minorType == hour}
+ {Token.string == "o"}
+ {Token.string == "'"}
+ {Token.string == "clock"}
+)
+:time 
+-->
+ :time.TempTime = {kind = "positive", rule = "TimeOClock"}
+
+ 
+Rule: TimeAnalogue
+// half past ten
+// ten to twelve
+// twenty six minutes to twelve
+
+(
+ (((({Lookup.majorType == number})?
+    {Lookup.majorType == number}
+   )
+   {Token.string == "minutes"}
+  ) |
+  ({Token.string == "half"} | 
+   {Token.string == "quarter"}) 
+ )
+ ({Token.string == "past"}|
+  {Token.string == "to"})
+ {Lookup.minorType == hour}
+)
+:time 
+-->
+ :time.TempTime = {kind = "positive", rule = "TimeAnalogue"}
+
+
+Rule: TimeWordsContext
+Priority: 50
+// seven thirty tomorrow
+
+(
+ {Lookup.majorType == number}
+ (
+  {Lookup.majorType == number}
+ )?
+):time1
+(
+ {Lookup.minorType == time_key}
+) 
+-->
+:time1.TempTime = {kind = "positive", rule = "TimeWordsContext"}
+
+
+Rule: TimeWords
+
+(
+ {Lookup.majorType == number}
+ (
+  {Lookup.majorType == number}
+ )?
+)
+:time
+-->
+  :time.TempTime = {kind = "timeWords", rule = "TimeWords"}
+
+  
+
+
+Rule: TimeDigitalContext1
+
+(
+(FOUR_DIGIT)
+):time
+{Lookup.minorType == time_key}
+ -->
+ :time.TempTime = {kind = "positive", rule = "TimeDigitalContext"}
+
+Rule: NotTimeDigitalContext2
+Priority: 100
+// prevent things like "at 0.61 km/h"
+
+(
+ {Token.string == "at"}
+)
+({Token.string == "0"}
+  ({Token.string == ":"}|{Token.string == "-"}|{Token.string == "."}) TWO_DIGIT
+ (TIME_AMPM)?
+ (TIME_ZONE)?
+)
+:time
+ -->
+ :time.Temp = {rule = "NotTimeDigitalContext2"}
+
+
+Rule: TimeDigitalContext2
+
+(
+ {Token.string == "at"}
+)
+(
+ FOUR_DIGIT | 
+ ((ONE_DIGIT|TWO_DIGIT)
+  ({Token.string == ":"}|{Token.string == "-"}|{Token.string == "."}) TWO_DIGIT
+ )
+ (TIME_AMPM)?
+ (TIME_ZONE)?
+)
+:time
+ -->
+ :time.TempTime = {kind = "positive", rule = "TimeDigitalContext2"}
+
+Rule: TimeDigitalTemp1
+
+(
+ FOUR_DIGIT | 
+ ((ONE_DIGIT|TWO_DIGIT)
+  ({Token.string == ":"}|{Token.string == "-"}|{Token.string == "."}) TWO_DIGIT
+ )
+)
+:time
+ -->
+ :time.TempTime = {kind = "temp", rule = "TimeDigitalTemp"}
+
+Rule: TimeDigitalContext1
+(
+ {Token.string == "in"}
+)?
+((ONE_DIGIT|TWO_DIGIT)
+ ({Token.string == ":"}|{Token.string == "."})
+ TWO_DIGIT
+ ({Token.string == "seconds"}|
+  {Token.string == "minutes"}|
+  {Token.string == "hours"}
+ )
+):time
+-->
+:time.TempTime = {kind = "positive", rule = "TimeDigitalContext1"}
+
+
+
+Rule: TimeDigitalContextConj
+
+(
+ {Token.string == "at"}
+)
+(
+ FOUR_DIGIT | 
+ ((ONE_DIGIT|TWO_DIGIT)
+  ({Token.string == ":"}|{Token.string == "-"}|{Token.string == "."}) TWO_DIGIT
+ )
+)
+:time1
+(
+ {Token.string == "and"}
+)
+(
+ FOUR_DIGIT | 
+ ((ONE_DIGIT|TWO_DIGIT)
+  ({Token.string == ":"}|{Token.string == "-"}|{Token.string == "."}) TWO_DIGIT
+ )
+):time2
+ -->
+ :time1.TempTime = {kind = "positive", rule = "TimeDigitalContextConj"},
+
+:time2.TempTime = {kind = "positive", rule = "TimeDigitalContextConj"}
+
+
+
+
+// NEW DATE RULES
+//////////////////////////////////////////////////////////////////
+
+// 1923 to 1925
+Rule: YearPeriod1
+Priority: 100
+(	
+	({Lookup.majorType == year} | (FOUR_DIGIT)):year1
+	(({Token.root == "to"} | {Token.string == "-"} | {Token.subkind == dashpunct}  | {Token.string == "Ð"}):separator)?
+	(	
+		(
+			(
+				({Lookup.majorType == year} | (FOUR_DIGIT)):year2
+			) |
+			(
+				({Token.root == "now"} | {Token.root == "present"} | {Token.root == "date"} | {Token.string == ""}):yearNow
+			)
+		)
+	)?
+)
+:exp
+--> 
+{
+//removes TempDate annotation, gets the rule feature and adds a new Date annotation
+gate.AnnotationSet exp = (gate.AnnotationSet)bindings.get("exp");
+gate.AnnotationSet year1 = (gate.AnnotationSet)bindings.get("year1");
+gate.Annotation dateAnn1 = (gate.Annotation)year1.iterator().next();
+
+gate.AnnotationSet year2 = (gate.AnnotationSet)bindings.get("year2");
+gate.Annotation dateAnn2 = null;
+if(year2 != null)
+	dateAnn2 = (gate.Annotation)year2.iterator().next();
+	
+gate.AnnotationSet separator = (gate.AnnotationSet)bindings.get("separator");
+
+gate.AnnotationSet yearNow = (gate.AnnotationSet)bindings.get("yearNow");
+
+
+gate.FeatureMap features = Factory.newFeatureMap();
+
+features.put("rule1", "Year2");
+	
+features.put("rule2", "YearPeriod1");
+features.put("year1", gate.Utils.stringFor(doc, dateAnn1));
+
+features.put("kind", "year");
+
+if(dateAnn2 != null)
+{
+	features.put("year2", gate.Utils.stringFor(doc, dateAnn2));
+	features.put("kind", "years");
+}
+else if(yearNow != null)
+{
+	features.put("year2", "now");
+	features.put("kind", "years");
+}
+else if(separator != null)
+{
+	features.put("year2", "now");
+	features.put("kind", "years");
+}
+	
+outputAS.add(exp.firstNode(), exp.lastNode(), "Date", features);
+exp = exp; //FIXME, FOR ALLOW PHONES TOO outputAS.removeAll(year1);
+
+if(year2 != null)
+	exp = exp; //FIXME, FOR ALLOW PHONES TOO outputAS.removeAll(year2);
+	
+if(yearNow != null)
+	exp = exp; //FIXME, FOR ALLOW PHONES TOO outputAS.removeAll(yearNow);
+}
+
+// from 1923 / 25  from 1923 / 5
+Rule: Year2
+Priority: 80
+// 1922
+(	
+	({Token.string == "from"} | {Token.string == "From"})?
+	((FOUR_DIGIT) | {Lookup.majorType == year}):year1
+	({Token.root == "to"} | {Token.string == "-"} | {Token.subkind == dashpunct}  | {Token.string == "Ð"})
+	((TWO_DIGIT) | (ONE_DIGIT)):year2
+)
+:exp -->
+{
+	//removes TempDate annotation, gets the rule feature and adds a new Date annotation
+	gate.AnnotationSet exp = (gate.AnnotationSet)bindings.get("exp");
+	gate.AnnotationSet year1 = (gate.AnnotationSet)bindings.get("year1");
+	gate.Annotation dateAnn1 = (gate.Annotation)year1.iterator().next();
+
+	gate.AnnotationSet year2 = (gate.AnnotationSet)bindings.get("year2");
+	gate.Annotation dateAnn2 = null;
+	dateAnn2 = (gate.Annotation)year2.iterator().next();
+
+	gate.FeatureMap features = Factory.newFeatureMap();
+
+	features.put("rule1", "Year2");
+	features.put("kind", "years");
+	String stringYear1 = gate.Utils.stringFor(doc, dateAnn1);
+	String stringYear2 = gate.Utils.stringFor(doc, dateAnn2);
+	Integer aux1 = Integer.parseInt(stringYear1.substring(0,2));
+	Integer aux2 = Integer.parseInt(stringYear1.substring(2,4));
+	Integer year2Int = Integer.parseInt(stringYear2);
+
+	if(aux2 < year2Int) 
+		year2Int = (aux1*100)+year2Int;
+	else 
+		year2Int = (aux1+1)*100+year2Int;
+		
+	features.put("year1", stringYear1);
+	Integer i = Integer.parseInt(gate.Utils.stringFor(doc, dateAnn2));
+	features.put("year2", year2Int.toString());
+	outputAS.add(exp.firstNode(), exp.lastNode(), "Date", features);
+	exp = exp; //FIXME, FOR ALLOW PHONES TOO outputAS.removeAll(year1);
+	exp = exp; //FIXME, FOR ALLOW PHONES TOO outputAS.removeAll(year2);
+
+	
+}
+
+// Since 1923 to now
+Rule: YearPeriod2
+Priority: 90
+(	
+	({Token.string == "since"} | {Token.string == "Since"} | {Token.string == "from"} | {Token.string == "From"} | {Token.string == "between"}|{Token.string == "Between"})
+	({Lookup.majorType == year} | (FOUR_DIGIT)):year1	
+	(({Token.root == "to"} | {Token.string == "-"} | {Token.subkind == dashpunct}  | {Token.string == "Ð"}  | {Token.string == "/"}):separator)?
+	(		
+		(
+			(
+				({Lookup.majorType == year} | (FOUR_DIGIT)):year2
+			) |
+			(
+				({Token.root == "now"} | {Token.root == "present"} | {Token.root == "date"}):yearNow
+			)
+		)
+	)?
+)
+:exp
+--> 
+{
+//removes TempDate annotation, gets the rule feature and adds a new Date annotation
+gate.AnnotationSet exp = (gate.AnnotationSet)bindings.get("exp");
+gate.AnnotationSet year1 = (gate.AnnotationSet)bindings.get("year1");
+gate.Annotation dateAnn1 = (gate.Annotation)year1.iterator().next();
+
+gate.AnnotationSet year2 = (gate.AnnotationSet)bindings.get("year2");
+gate.Annotation dateAnn2 = null;
+if(year2 != null)
+	dateAnn2 = (gate.Annotation)year2.iterator().next();
+	
+gate.AnnotationSet yearNow = (gate.AnnotationSet)bindings.get("yearNow");
+
+gate.FeatureMap features = Factory.newFeatureMap();
+
+features.put("rule1", "Year2");	
+features.put("rule2", "YearPeriod2");
+features.put("year1", gate.Utils.stringFor(doc, dateAnn1));
+
+features.put("kind", "year");
+
+gate.AnnotationSet separator = (gate.AnnotationSet)bindings.get("separator");
+
+if(dateAnn2 != null)
+{
+	features.put("year2", gate.Utils.stringFor(doc, dateAnn2));
+	features.put("kind", "years");
+}
+else if(yearNow != null)
+{
+	features.put("year2", "now");
+	features.put("kind", "years");
+}
+else if(separator != null)
+{
+	features.put("year2", "now");	
+	features.put("kind", "years");
+}
+	
+outputAS.add(exp.firstNode(), exp.lastNode(), "Date", features);
+exp = exp; //FIXME, FOR ALLOW PHONES TOO outputAS.removeAll(year1);
+
+if(year2 != null)
+	exp = exp; //FIXME, FOR ALLOW PHONES TOO outputAS.removeAll(year2);	
+		
+if(yearNow != null)
+	exp = exp; //FIXME, FOR ALLOW PHONES TOO outputAS.removeAll(yearNow);
+}
+
+
+Rule: YearMonthPeriod1
+Priority: 100
+(	
+	({Lookup.minorType == month}):month1
+	({Lookup.majorType == year} | (FOUR_DIGIT)):year1	
+	(({Token.root == "to"} | {Token.string == "-"} | {Token.subkind == dashpunct}  | {Token.string == "Ð"}  | {Token.string == "/"}):separator)?	
+	(	
+		(
+			(
+				({Lookup.minorType == month}):month2
+				({Lookup.majorType == year} | (FOUR_DIGIT)):year2
+			) |
+			(
+				({Token.root == "now"} | {Token.root == present}):yearNow
+			)
+		)
+	)?	
+)
+:exp
+--> 
+{
+gate.FeatureMap features = Factory.newFeatureMap();
+
+//removes TempDate annotation, gets the rule feature and adds a new Date annotation
+gate.AnnotationSet exp = (gate.AnnotationSet)bindings.get("exp");
+
+//System.out.println("DATE FOUND " + gate.Utils.stringFor(doc, exp));
+
+gate.AnnotationSet year1 = (gate.AnnotationSet)bindings.get("year1");
+gate.Annotation dateAnn1 = (gate.Annotation)year1.iterator().next();
+features.put("year1", gate.Utils.stringFor(doc, dateAnn1));
+
+AnnotationSet month_set1 = bindings.get("month1");
+gate.Annotation monthAnn1 = (gate.Annotation)month_set1.iterator().next();
+String monthName = gate.Utils.stringFor(doc, monthAnn1);
+DateFormatSymbols dfs = new DateFormatSymbols(Locale.US);
+String[] months = dfs.getMonths();
+String[] short_months = dfs.getShortMonths();
+for(Integer i = 0; i < 13; i++)
+{
+	if(  monthName.equals(months[i])
+	   | monthName.equals(months[i].toUpperCase())
+	   | monthName.equals(short_months[i])
+	   | monthName.equals(short_months[i] + ".")
+	   | monthName.equals(short_months[i].toUpperCase())
+	   | monthName.equals(short_months[i].toUpperCase() + ".")
+	   )
+	{
+		i++;
+		features.put("month1",  (i).toString());
+		i = 13;
+	}
+}
+
+features.put("kind", "month_year");
+
+gate.AnnotationSet separator = (gate.AnnotationSet)bindings.get("separator");
+
+gate.AnnotationSet year2 = (gate.AnnotationSet)bindings.get("year2");
+gate.Annotation dateAnn2 = null;
+gate.AnnotationSet yearNow = (gate.AnnotationSet)bindings.get("yearNow");
+if(year2 != null)
+{	
+	dateAnn2 = (gate.Annotation)year2.iterator().next();	
+	features.put("year2", gate.Utils.stringFor(doc, dateAnn2));
+	
+	AnnotationSet month_set2 = bindings.get("month2");
+	gate.Annotation monthAnn2 = (gate.Annotation)month_set2.iterator().next();
+	monthName = gate.Utils.stringFor(doc, monthAnn2);
+	for(Integer i = 0; i < 13; i++)
+	{
+		if(  monthName.equals(months[i])
+		   | monthName.equals(months[i].toUpperCase())
+		   | monthName.equals(short_months[i])
+		   | monthName.equals(short_months[i] + ".")
+		   | monthName.equals(short_months[i].toUpperCase())
+		   | monthName.equals(short_months[i].toUpperCase() + ".")
+		   )
+		{
+			i++;
+			features.put("month2",  i.toString());
+			i = 13;
+		}
+	}
+	features.put("kind", "months_years");
+}
+else if(yearNow != null)
+{
+	features.put("year2", "now");	
+	features.put("kind", "months_years");
+}
+else if(separator != null)
+{
+	features.put("year2", "now");
+	features.put("kind", "months_years");
+}
+	
+features.put("rule1", "YearMonthPeriod1");	
+
+outputAS.add(exp.firstNode(), exp.lastNode(), "Date", features);
+}
+
+Rule: YearMonthPeriod2
+Priority: 100
+(	
+	((TWO_DIGIT)):month1
+	{Token.string == "/"}
+	((TWO_DIGIT)):year1	
+	(({Token.root == "to"} | {Token.string == "-"} | {Token.subkind == dashpunct}  | {Token.string == "Ð"}):separator)?	
+	(	
+		(
+			(
+				((TWO_DIGIT)):month2
+				{Token.string == "/"}
+				((TWO_DIGIT)):year2	
+			) |
+			(
+				({Token.root == "now"} | {Token.root == present}):yearNow
+			)
+		)
+	)?	
+)
+:exp
+--> 
+{
+gate.FeatureMap features = Factory.newFeatureMap();
+
+//removes TempDate annotation, gets the rule feature and adds a new Date annotation
+gate.AnnotationSet exp = (gate.AnnotationSet)bindings.get("exp");
+
+//System.out.println("DATE FOUND " + gate.Utils.stringFor(doc, exp));
+
+gate.AnnotationSet year1 = (gate.AnnotationSet)bindings.get("year1");
+gate.Annotation dateAnn1 = (gate.Annotation)year1.iterator().next();
+features.put("year1", gate.Utils.stringFor(doc, dateAnn1));
+
+AnnotationSet month_set1 = bindings.get("month1");
+gate.Annotation monthAnn1 = (gate.Annotation)month_set1.iterator().next();
+features.put("month1",  gate.Utils.stringFor(doc, monthAnn1));
+
+gate.AnnotationSet year2 = (gate.AnnotationSet)bindings.get("year2");
+gate.Annotation dateAnn2 = null;
+gate.AnnotationSet yearNow = (gate.AnnotationSet)bindings.get("yearNow");
+
+gate.AnnotationSet separator = (gate.AnnotationSet)bindings.get("separator");
+
+features.put("kind", "month_year");
+
+if(year2 != null)
+{	
+	dateAnn2 = (gate.Annotation)year2.iterator().next();	
+	features.put("year2", gate.Utils.stringFor(doc, dateAnn2));
+	
+	AnnotationSet month_set2 = bindings.get("month2");
+	gate.Annotation monthAnn2 = (gate.Annotation)month_set2.iterator().next();
+	features.put("month2",  gate.Utils.stringFor(doc, monthAnn2));	
+	features.put("kind", "months_years");
+}	
+else if(yearNow != null)
+{
+	features.put("year2", "now");
+	features.put("kind", "months_years");	
+}
+else if(separator != null)
+{
+	features.put("year2", "now");
+	features.put("kind", "months_years");
+}
+	
+features.put("rule1", "YearMonthPeriod2");	
+
+outputAS.add(exp.firstNode(), exp.lastNode(), "Date", features);
+}
+
+Rule: YearMonthPeriod3
+Priority: 100
+(	
+	({Lookup.minorType == month}):month1
+	({Token.root == "."})?
+	({Token.kind == "punctuation"} | {Token.kind == "punctuation"})?
+	((TWO_DIGIT)):year1	
+	(({Token.root == "to"} | {Token.string == "-"} | {Token.subkind == dashpunct}  | {Token.string == "Ð"}):separator)?	
+	(	
+		(
+			(
+				({Lookup.minorType == month}):month2
+				({Token.root == "."})?
+				({Token.kind == "punctuation"} | {Token.kind == "punctuation"})?
+				((TWO_DIGIT)):year2
+			) |
+			(
+				({Token.root == "now"} | {Token.root == present}):yearNow
+			)
+		)
+	)?	
+)
+:exp
+--> 
+{
+gate.FeatureMap features = Factory.newFeatureMap();
+
+//removes TempDate annotation, gets the rule feature and adds a new Date annotation
+gate.AnnotationSet exp = (gate.AnnotationSet)bindings.get("exp");
+
+//System.out.println("DATE FOUND " + gate.Utils.stringFor(doc, exp));
+
+gate.AnnotationSet year1 = (gate.AnnotationSet)bindings.get("year1");
+gate.Annotation dateAnn1 = (gate.Annotation)year1.iterator().next();
+String year1String = gate.Utils.stringFor(doc, dateAnn1);
+Integer year1Int = Integer.parseInt(year1String);
+if(year1Int < 15)
+{
+	year1Int = year1Int + 2000;	
+}
+else
+{
+	year1Int = year1Int + 1900;	
+}
+features.put("year1", year1Int.toString());
+
+AnnotationSet month_set1 = bindings.get("month1");
+gate.Annotation monthAnn1 = (gate.Annotation)month_set1.iterator().next();
+String monthName = gate.Utils.stringFor(doc, monthAnn1);
+DateFormatSymbols dfs = new DateFormatSymbols(Locale.US);
+String[] months = dfs.getMonths();
+String[] short_months = dfs.getShortMonths();
+for(Integer i = 0; i < 13; i++)
+{
+	if(  monthName.equals(months[i])
+	   | monthName.equals(months[i].toUpperCase())
+	   | monthName.equals(short_months[i])
+	   | monthName.equals(short_months[i] + ".")
+	   | monthName.equals(short_months[i].toUpperCase())
+	   | monthName.equals(short_months[i].toUpperCase() + ".")
+	   )
+	{
+		i++;
+		features.put("month1",  (i).toString());
+		i = 13;
+	}
+}
+
+features.put("kind", "month_year");
+
+gate.AnnotationSet separator = (gate.AnnotationSet)bindings.get("separator");
+
+gate.AnnotationSet year2 = (gate.AnnotationSet)bindings.get("year2");
+gate.Annotation dateAnn2 = null;
+gate.AnnotationSet yearNow = (gate.AnnotationSet)bindings.get("yearNow");
+if(year2 != null)
+{	
+	dateAnn2 = (gate.Annotation)year2.iterator().next();	
+	String year2String = gate.Utils.stringFor(doc, dateAnn2);
+	Integer year2Int = Integer.parseInt(year2String);
+	if(year2Int < 15)
+	{
+		year2Int = year2Int + 2000;	
+	}
+	else
+	{
+		year2Int = year2Int + 1900;	
+	}
+	features.put("year2", year2Int.toString());	
+	
+	AnnotationSet month_set2 = bindings.get("month2");
+	gate.Annotation monthAnn2 = (gate.Annotation)month_set2.iterator().next();
+	monthName = gate.Utils.stringFor(doc, monthAnn2);
+	for(Integer i = 0; i < 13; i++)
+	{
+		if(  monthName.equals(months[i])
+		   | monthName.equals(months[i].toUpperCase())
+		   | monthName.equals(short_months[i])
+		   | monthName.equals(short_months[i] + ".")
+		   | monthName.equals(short_months[i].toUpperCase())
+		   | monthName.equals(short_months[i].toUpperCase() + ".")
+		   )
+		{
+			i++;
+			features.put("month2",  i.toString());
+			i = 13;
+		}
+	}
+	features.put("kind", "months_years");
+}
+else if(yearNow != null)
+{
+	features.put("year2", "now");	
+	features.put("kind", "months_years");
+}
+else if(separator != null)
+{
+	features.put("year2", "now");
+	features.put("kind", "months_years");
+}
+	
+features.put("rule1", "YearMonthPeriod1");	
+
+outputAS.add(exp.firstNode(), exp.lastNode(), "Date", features);
+}
+
+Rule: YearMonthDayPeriod1
+Priority: 100
+(	
+	((ONE_DIGIT) | (TWO_DIGIT) | ({Token.string ==~ "[0-9][0-9]?(th|rd|nd|st)"})):day1	
+	({Token.string == "."} | {Token.string == "-"})?
+	({Lookup.minorType == month}):month1
+	({Token.string == ","} | {Token.string == "."} | {Token.string == "-"})?
+	({Lookup.majorType == year} | (FOUR_DIGIT)):year1	
+	(({Token.root == "to"} | {Token.string == "-"} | {Token.subkind == dashpunct}  | {Token.string == "Ð"}  | {Token.string == "/"}):separator)?	
+	(	
+		(
+			(
+				((ONE_DIGIT) | (TWO_DIGIT) | ({Token.string ==~ "[0-9][0-9]?(th|rd|nd|st)"})):day2
+				({Token.string == "."} | {Token.string == "-"})?
+				({Lookup.minorType == month}):month2
+				({Token.string == "."} | {Token.string == "-"})?
+				({Lookup.majorType == year} | (FOUR_DIGIT)):year2
+			) |
+			(
+				({Token.root == "now"} | {Token.root == present}):yearNow
+			)
+		)
+	)?	
+)
+:exp
+--> 
+{
+gate.FeatureMap features = Factory.newFeatureMap();
+
+//removes TempDate annotation, gets the rule feature and adds a new Date annotation
+gate.AnnotationSet exp = (gate.AnnotationSet)bindings.get("exp");
+
+//System.out.println("DATE FOUND " + gate.Utils.stringFor(doc, exp));
+
+gate.AnnotationSet year1 = (gate.AnnotationSet)bindings.get("year1");
+gate.Annotation dateAnn1 = (gate.Annotation)year1.iterator().next();
+features.put("year1", gate.Utils.stringFor(doc, dateAnn1));
+
+AnnotationSet month_set1 = bindings.get("month1");
+gate.Annotation monthAnn1 = (gate.Annotation)month_set1.iterator().next();
+String monthName = gate.Utils.stringFor(doc, monthAnn1);
+DateFormatSymbols dfs = new DateFormatSymbols(Locale.US);
+String[] months = dfs.getMonths();
+String[] short_months = dfs.getShortMonths();
+for(Integer i = 0; i < 13; i++)
+{
+	if(  monthName.equals(months[i])
+	   | monthName.equals(months[i].toUpperCase())
+	   | monthName.equals(short_months[i])
+	   | monthName.equals(short_months[i] + ".")
+	   | monthName.equals(short_months[i].toUpperCase())
+	   | monthName.equals(short_months[i].toUpperCase() + ".")
+	   )
+	{
+		i++;
+		features.put("month1",  (i).toString());
+		i = 13;
+	}
+}
+
+gate.AnnotationSet day1 = (gate.AnnotationSet)bindings.get("day1");
+gate.Annotation dayAnn1 = (gate.Annotation)day1.iterator().next();
+features.put("day1", gate.Utils.stringFor(doc, dayAnn1).replace("rd","").replace("nd","").replace("st","").replace("th", ""));
+
+gate.AnnotationSet separator = (gate.AnnotationSet)bindings.get("separator");
+
+gate.AnnotationSet year2 = (gate.AnnotationSet)bindings.get("year2");
+gate.Annotation dateAnn2 = null;
+gate.AnnotationSet yearNow = (gate.AnnotationSet)bindings.get("yearNow");
+
+features.put("kind", "day_month_year");
+
+if(year2 != null)
+{	
+	dateAnn2 = (gate.Annotation)year2.iterator().next();	
+	features.put("year2", gate.Utils.stringFor(doc, dateAnn2));
+	
+	AnnotationSet month_set2 = bindings.get("month2");
+	gate.Annotation monthAnn2 = (gate.Annotation)month_set2.iterator().next();
+	monthName = gate.Utils.stringFor(doc, monthAnn2);
+	for(Integer i = 0; i < 13; i++)
+	{
+		if(  monthName.equals(months[i])
+		   | monthName.equals(months[i].toUpperCase())
+		   | monthName.equals(short_months[i])
+		   | monthName.equals(short_months[i] + ".")
+		   | monthName.equals(short_months[i].toUpperCase())
+		   | monthName.equals(short_months[i].toUpperCase() + ".")
+		   )
+		{
+			i++;
+			features.put("month2",  i.toString());
+			i = 13;
+		}
+	}
+	
+	gate.AnnotationSet day2 = (gate.AnnotationSet)bindings.get("day2");
+	gate.Annotation dayAnn2 = (gate.Annotation)day2.iterator().next();
+	features.put("day2", gate.Utils.stringFor(doc, dayAnn2).replace("rd","").replace("nd","").replace("st","").replace("th", ""));
+
+	features.put("kind", "days_months_years");
+}
+else if(yearNow != null)
+{
+	features.put("year2", "now");	
+	features.put("kind", "days_months_years");
+}
+else if(separator != null)
+{
+	features.put("year2", "now");
+	features.put("kind", "days_months_years");
+}
+	
+features.put("rule1", "YearMonthDayPeriod1");	
+
+outputAS.add(exp.firstNode(), exp.lastNode(), "Date", features);
+}
+
+
+Rule: YearMonthDayPeriod2
+Priority: 100
+(	
+	((TWO_DIGIT | ONE_DIGIT)):day1
+	({Token.root == "."} | {Token.root == "-"})
+	((TWO_DIGIT | ONE_DIGIT)):month1
+	({Token.root == "."} | {Token.root == "-"})
+	((TWO_DIGIT | FOUR_DIGIT)):year1	
+	(({Token.root == "to"} | {Token.string == "-"} | {Token.subkind == dashpunct}  | {Token.string == "Ð"}):separator)?	
+	(	
+		(
+			(
+				((TWO_DIGIT | ONE_DIGIT)):day2
+				({Token.root == "."} | {Token.root == "-"})
+				((TWO_DIGIT | ONE_DIGIT)):month2
+				({Token.string == "."} | {Token.string == "-"})
+				((TWO_DIGIT | FOUR_DIGIT)):year2
+			) |
+			(
+				({Token.root == "now"} | {Token.root == present}):yearNow
+			)
+		)
+	)?	
+)
+:exp
+--> 
+{
+gate.FeatureMap features = Factory.newFeatureMap();
+
+//removes TempDate annotation, gets the rule feature and adds a new Date annotation
+gate.AnnotationSet exp = (gate.AnnotationSet)bindings.get("exp");
+
+//System.out.println("DATE FOUND " + gate.Utils.stringFor(doc, exp));
+
+gate.AnnotationSet year1 = (gate.AnnotationSet)bindings.get("year1");
+gate.Annotation dateAnn1 = (gate.Annotation)year1.iterator().next();
+features.put("year1", gate.Utils.stringFor(doc, dateAnn1));
+
+
+AnnotationSet month_set1 = bindings.get("month1");
+gate.Annotation monthAnn1 = (gate.Annotation)month_set1.iterator().next();
+features.put("month1",  gate.Utils.stringFor(doc, monthAnn1));
+
+gate.AnnotationSet day1 = (gate.AnnotationSet)bindings.get("day1");
+gate.Annotation dayAnn1 = (gate.Annotation)day1.iterator().next();
+features.put("day1", gate.Utils.stringFor(doc, dayAnn1).replace("rd","").replace("nd","").replace("st","").replace("th", ""));
+
+gate.AnnotationSet separator = (gate.AnnotationSet)bindings.get("separator");
+
+gate.AnnotationSet year2 = (gate.AnnotationSet)bindings.get("year2");
+gate.Annotation dateAnn2 = null;
+gate.AnnotationSet yearNow = (gate.AnnotationSet)bindings.get("yearNow");
+
+features.put("kind", "day_month_year");
+
+
+if(year2 != null)
+{	
+	dateAnn2 = (gate.Annotation)year2.iterator().next();	
+	features.put("year2", gate.Utils.stringFor(doc, dateAnn2));	
+	
+	AnnotationSet month_set2 = bindings.get("month2");
+	gate.Annotation monthAnn2 = (gate.Annotation)month_set2.iterator().next();
+	features.put("month2",  gate.Utils.stringFor(doc, monthAnn2));	
+	
+	gate.AnnotationSet day2 = (gate.AnnotationSet)bindings.get("day2");
+	gate.Annotation dayAnn2 = (gate.Annotation)day2.iterator().next();
+	features.put("day2", gate.Utils.stringFor(doc, dayAnn2).replace("rd","").replace("nd","").replace("st","").replace("th", ""));
+	features.put("kind", "days_months_years");
+}	
+else if(yearNow != null)
+{
+	features.put("year2", "now");		
+	features.put("kind", "days_months_years");
+}
+else if(separator != null)
+{
+	features.put("year2", "now");
+	features.put("kind", "days_months_years");
+}
+
+features.put("rule1", "YearMonthDayPeriod2");	
+
+outputAS.add(exp.firstNode(), exp.lastNode(), "Date", features);
+}
+
+
+Rule: YearMonthDayPeriod3
+Priority: 100
+(		
+	((TWO_DIGIT | ONE_DIGIT)):month1
+	({Token.root == "/"})
+	((TWO_DIGIT | FOUR_DIGIT)):year1	
+	(({Token.root == "to"} | {Token.string == "-"} | {Token.subkind == dashpunct}  | {Token.string == "Ð"}):separator)?	
+	(	
+		(
+			(				
+				((TWO_DIGIT | ONE_DIGIT)):month2
+				({Token.root == "/"})
+				((TWO_DIGIT | FOUR_DIGIT)):year2
+			) |
+			(
+				({Token.root == "now"} | {Token.root == present}):yearNow
+			)
+		)
+	)?	
+)
+:exp
+--> 
+{
+gate.FeatureMap features = Factory.newFeatureMap();
+
+//removes TempDate annotation, gets the rule feature and adds a new Date annotation
+gate.AnnotationSet exp = (gate.AnnotationSet)bindings.get("exp");
+
+//System.out.println("DATE FOUND " + gate.Utils.stringFor(doc, exp));
+
+gate.AnnotationSet year1 = (gate.AnnotationSet)bindings.get("year1");
+gate.Annotation dateAnn1 = (gate.Annotation)year1.iterator().next();
+features.put("year1", gate.Utils.stringFor(doc, dateAnn1));
+
+
+AnnotationSet month_set1 = bindings.get("month1");
+gate.Annotation monthAnn1 = (gate.Annotation)month_set1.iterator().next();
+features.put("month1",  gate.Utils.stringFor(doc, monthAnn1));
+
+gate.AnnotationSet separator = (gate.AnnotationSet)bindings.get("separator");
+
+gate.AnnotationSet year2 = (gate.AnnotationSet)bindings.get("year2");
+gate.Annotation dateAnn2 = null;
+gate.AnnotationSet yearNow = (gate.AnnotationSet)bindings.get("yearNow");
+
+features.put("kind", "month_year");
+
+if(year2 != null)
+{	
+	dateAnn2 = (gate.Annotation)year2.iterator().next();	
+	features.put("year2", gate.Utils.stringFor(doc, dateAnn2));	
+	
+	AnnotationSet month_set2 = bindings.get("month2");
+	gate.Annotation monthAnn2 = (gate.Annotation)month_set2.iterator().next();
+	features.put("month2",  gate.Utils.stringFor(doc, monthAnn2));		
+	
+	features.put("kind", "months_years");
+}	
+else if(yearNow != null)
+{
+	features.put("year2", "now");		
+	features.put("kind", "months_years");
+}
+else if(separator != null)
+{
+	features.put("year2", "now");
+	features.put("kind", "months_years");
+}
+
+features.put("rule1", "YearMonthDayPeriod3");	
+
+outputAS.add(exp.firstNode(), exp.lastNode(), "Date", features);
+}
+
+
+
+// Date Rules
+
+//Rule: IgnoreDatePerson
+//Priority: 500
+//(
+// {Date}
+// {Person}
+//)
+//:date
+//-->
+//{}
+
+/*
+
+Rule:	DateSlash           // UK only
+// Wed, 10/July/00
+// 10/July
+// July/99
+
+(
+ ((DAY_NAME (COMMA)? )?
+ NUM_OR_ORDINAL SLASH MONTH_NAME (SLASH YEAR)? )|
+ (MONTH_NAME SLASH YEAR) 
+)
+:date
+-->
+ :date.TempDate = {rule = "DateSlash"}
+
+
+
+Rule:	DateDash
+// Wed 10-July-00
+// 10-July 00
+// 10-July
+
+(  
+ ((DAY_NAME (COMMA)?)?
+  (NUM_OR_ORDINAL DASH MONTH_NAME (DASH)? YEAR)) |
+
+ ((DAY_NAME (COMMA)?)?
+  NUM_OR_ORDINAL DASH MONTH_NAME)
+)
+:date
+-->
+ :date.TempDate = {rule = "DateDash"}
+
+
+
+Rule: 	DateName
+Priority: 20
+// Wed 10 July
+// Wed 10 July, 2000
+// Sun, 21 May 2000
+// 10th of July, 2000
+// 10 July
+// 10th of July
+// July, 2000
+
+(
+ (DAY_NAME NUM_OR_ORDINAL MONTH_NAME)|
+
+ (DAY_NAME (COMMA)? 
+  NUM_OR_ORDINAL MONTH_NAME ((COMMA)? YEAR)?) 
+|
+
+ ((DAY_NAME (COMMA)? )?
+ NUM_OR_ORDINAL MONTH_NAME 
+ ((COMMA)? YEAR)?)
+|
+
+ (NUM_OR_ORDINAL MONTH_NAME) 
+| 
+(MONTH_NAME (COMMA)? YEAR)
+)
+:date
+-->
+ :date.TempDate = {rule = "DateName"}
+
+
+Rule: DateNameSpan1
+// 5-20 Jan
+
+(
+ NUM_OR_ORDINAL
+ {Token.string == "-"}
+ (NUM_OR_ORDINAL MONTH_NAME ((COMMA)?  YEAR)?)
+)
+:date
+-->
+ :date.TempDate = {rule = "DateNameSpan1"}
+
+Rule: DateNameSpan2
+// Jan 5-20
+
+(MONTH_NAME
+
+ NUM_OR_ORDINAL 
+ {Token.string == "-"}
+ (NUM_OR_ORDINAL ((COMMA)?  YEAR)?)
+)
+:date
+-->
+ :date.TempDate = {rule = "DateNameSpan2"}
+
+Rule: DateNameRev
+// Wed. July 1st, 2000
+// Wed, July 1, 2000
+// Wed, July 1st, 2000
+(         
+ ((DAY_NAME (COMMA)? )?
+  MONTH_NAME  
+  ({Token.string == "the"})?
+ NUM_OR_ORDINAL 
+ ((COMMA)? YEAR)?) |
+         
+ (MONTH_NAME (COMMA)? YEAR)
+)
+:date
+-->
+ :date.TempDate = {rule = "DateNameRev"}
+
+
+Rule:	DateNumDash
+// 01-07-00
+// Note: not 07-00
+  
+(
+ (DAY_MONTH_NUM DASH DAY_MONTH_NUM DASH YEAR)
+)
+:date
+-->
+ :date.TempDate = {rule = "DateNumDash"}
+
+Rule:	DateNumDashRev
+// 00-07-01
+// 2000-07
+
+(
+ (YEAR DASH DAY_MONTH_NUM DASH DAY_MONTH_NUM)|
+ (FOUR_DIGIT DASH DAY_MONTH_NUM)
+)
+:date
+-->
+ :date.TempDate = {rule = "DateNumDashRev"}
+
+
+Rule:	DateNumSlash
+// 01/07/00
+// Note: not 07/00
+
+( 
+DAY_MONTH_NUM SLASH DAY_MONTH_NUM SLASH YEAR
+)
+:date
+-->
+ :date.TempDate = {rule = "DateNumSlash"}
+
+
+Rule: ModifierMonth
+//early October
+
+( DATE_PRE 
+  {Lookup.minorType == month}
+)
+:date -->
+ :date.TempDate = {rule = "ModifierMonth"}
+
+
+Rule: YearAdBc
+
+// 1900 AD
+(
+ (YEAR 
+  AD_BC)
+)
+:year -->
+ :year.YearTemp = {kind = "positive", rule = "YearAdBc"}
+
+Rule: YearSpan1
+// the early 90s
+// the late 80s
+(
+ {Token.string == "the"}
+ (DATE_PRE)?
+ (YEAR)
+ ({Token.string == "'"})?
+ ({Token.string == "s"})
+)
+:date -->
+ :date.TempDate = {rule = "YearSpan1"}
+
+Rule: YearSpan2
+// 1980/81
+
+(
+ (FOUR_DIGIT)
+ ({Token.string == "/"}|
+  {Token.string == "-"})
+ (FOUR_DIGIT|TWO_DIGIT | ONE_DIGIT)
+)
+:date -->
+ :date.TempDate = {rule = "YearSpan2"}
+
+Rule: YearSpan3
+Priority: 80
+
+// from 1980 to 1981
+// between 1980 and 1981
+(
+ (({Token.string == "from"}| {Token.string == "From"})
+  (FOUR_DIGIT)
+  {Token.string == "to"}
+  (FOUR_DIGIT)
+ ) |
+  (({Token.string == "between"}|{Token.string == "Between"}) 
+  (FOUR_DIGIT)
+  {Token.string == "and"}
+  (FOUR_DIGIT)
+ )
+)
+:date -->
+ :date.TempDate = {rule = "YearSpan3"}
+
+Rule: YearContext1
+Priority: 70
+({Token.string == "In"}|
+{Token.string == "in"}|
+{Token.string == "by"}|
+{Token.string == "By"}
+)
+(YEAR)
+:date -->
+ :date.TempDate = {rule = "YearContext1"}
+
+Rule: YearContext2
+Priority: 70
+({Token.string == "Since"} | {Token.string == "since"})
+(YEAR)
+:date -->
+ :date.TempDate = {rule = "YearContext2"}
+ 
+Rule: YearContext3
+Priority: 70 	
+(
+({Token.string == "followed"} | {Token.root == "graduate"})		
+({Token.category == IN})?		
+(YEAR)				
+(				
+	({Token.string == "until"} | {Token.string == "and"})			
+	(YEAR)
+)
+):date
+-->
+:date.TempDate = {rule = "YearContext3"}
+
+// Currently, temp1, temp2 and temp3 look good; temp4 is not to be counted
+// but this may change according to the text
+// only positives will be used in final grammar, not negatives
+
+Rule: YearTemp1
+Priority: 30
+// (1987)
+
+({Token.position == startpunct})
+(FOUR_DIGIT)
+:date
+({Token.position == endpunct})
+ -->
+ :date.TempYear = {kind = "positive", rule = "TempYear1"}
+
+
+Rule: TempYear2
+Priority: 20
+// 1987
+
+(
+ {Lookup.majorType == year}
+)
+:date -->
+ :date.TempYear = {kind = "positive", rule = "TempYear2"}
+
+
+Rule: TempYear3
+Priority: 10
+// 1922
+
+(FOUR_DIGIT)
+:date -->
+ :date.TempYear = {kind = "positive", rule = "TempYear3"}
+
+
+Rule: YearWords
+// nineteen twenty three
+// nineteen ten
+
+(
+ {Token.string == "nineteen"}
+ ({Lookup.majorType == number}
+ )?
+ {Lookup.majorType == number}
+)
+ :date -->
+ :date.TempYear = {kind = "positive", rule = "YearWords"}
+
+
+
+Rule: TimeZone
+// +0400
+(
+ (TIME_DIFF)
+ (TIME_ZONE)?
+)
+:date
+-->
+ :date.TempZone = {rule = "TimeZone"}
+*/
+
+
+
+
+
+
+
+

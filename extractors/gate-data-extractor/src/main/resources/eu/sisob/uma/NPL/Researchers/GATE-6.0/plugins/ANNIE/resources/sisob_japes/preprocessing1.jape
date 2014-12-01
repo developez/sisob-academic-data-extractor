@@ -1,0 +1,69 @@
+﻿/*
+*  preprocessing1.jape
+*/
+
+Phase: preprocessing1
+Input: Lookup 
+
+Rule: Preprocess1
+(
+{Lookup.minorType==Nombre}
+):varNombre
+
+--> 
+:varNombre
+  {
+    gate.AnnotationSet matchedAnns= (gate.AnnotationSet) bindings.get("varNombre");	
+	gate.FeatureMap newFeatures= Factory.newFeatureMap();
+	newFeatures.put("rule","Preprocess1");
+	annotations.add(matchedAnns.firstNode(),matchedAnns.lastNode(),"NombrePersona", newFeatures);
+  }
+
+Rule: Preprocess2
+(
+{Lookup.minorType==Apellido}
+):varApellido
+
+--> 
+:varApellido
+  {
+    gate.AnnotationSet matchedAnns= (gate.AnnotationSet) bindings.get("varApellido");	
+	gate.FeatureMap newFeatures= Factory.newFeatureMap();
+	newFeatures.put("rule","Preprocess2");
+	annotations.add(matchedAnns.firstNode(),matchedAnns.lastNode(),"ApellidoPersona", newFeatures);
+  }
+  
+Rule: Preprocess3
+(
+(
+{ApellidoPersona}
+):a1
+(
+{ApellidoPersona}
+)
+:a2
+
+):varNombreCompleto
+
+--> 
+:varNombreCompleto
+{
+    gate.AnnotationSet matchedAnns= (gate.AnnotationSet) bindings.get("varNombreCompleto");	
+	gate.FeatureMap newFeatures= Factory.newFeatureMap();
+	newFeatures.put("rule","Preprocess3");
+	annotations.add(matchedAnns.firstNode(),matchedAnns.lastNode(),"NombreCompletoPersona", newFeatures);
+}
+
+Rule: Preprocess4
+(
+({Token.string == "Grupo"})
+)
+:varTlf
+-->
+:varTlf
+{
+    gate.AnnotationSet matchedAnns= (gate.AnnotationSet) bindings.get("varTlf");	
+	gate.FeatureMap newFeatures= Factory.newFeatureMap();
+	newFeatures.put("rule","Preprocess4");
+	annotations.add(matchedAnns.firstNode(),matchedAnns.lastNode(),"SustantivoTlf", newFeatures);
+  }

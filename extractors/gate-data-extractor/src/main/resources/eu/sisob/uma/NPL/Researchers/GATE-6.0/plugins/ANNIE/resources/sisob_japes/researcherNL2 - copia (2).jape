@@ -1,0 +1,1076 @@
+﻿/*
+*  name.jape
+*
+* Copyright (c) 1998-2004, The University of Sheffield.
+*
+*  This file is part of GATE (see http://gate.ac.uk/), and is free
+*  software, licenced under the GNU Library General Public License,
+*  Version 2, June 1991 (in the distribution as file licence.html,
+*  and also available at http://gate.ac.uk/gate/licence.html).
+*
+*  Diana Maynard, 10 Sep 2001
+* 
+*  $Id: name.jape 13147 2010-10-15 08:30:24Z markagreenwood $
+*/
+
+Phase:	researcherNL2
+Options: control = appelt debug = false
+
+Macro: GENERAL_PREFIX
+(		
+	(		
+		{Token.kind == word}
+		(SPACE)?
+	)[1,4]	
+	({Token.kind == punctuation})?
+	(NEW_LINE)
+)
+
+
+Macro: CV_PREFIX
+(	
+	(
+		(
+			{Token.string == "Scientific"} 
+			(SPACE)
+			{Token.string == "Vita"}
+		) |
+		(
+			{Token.string == "Curriculum"} 
+			(SPACE)
+			{Token.string == "Vitae"}
+		) |
+		(				
+			{Token.string == "Career"}
+		) |
+		(				
+			{Token.string == "Education"}
+		) |
+		(				
+			{Token.string == "Biography"}
+		)
+	)
+	({Token.kind == punctuation})?
+	(NEW_LINE)
+)
+
+
+Macro: PERSONOBTAIN
+(		
+		({Token.category == PRP} | {Person})		
+		(				
+			(
+				 {SpaceToken.kind == space}
+				 {Token.root == also}			
+			)?			
+			(
+				({SpaceToken.kind == space})
+				({Token.root == "obtain"} | {Token.root == "receive"})
+			)
+			(
+				 {SpaceToken.kind == space}
+				 {Token.category == "PRP$"}
+			)?						
+			(
+				 {SpaceToken.kind == space}
+				 {Token.category == "DT"}
+			)?			
+		)			
+)
+
+Macro: ACADEMIC_DEGREE
+(
+	{Lookup.majorType == degree, Lookup.minorType == academic}	
+	({Token.string == "."})?
+)
+
+Rule: ResearcherDegreePattern
+Priority: 150
+(	
+	(
+		(		
+		((DATAOFCAREERSTATION):varResearcherDegreeDateCT)
+		({Token.kind == punctuation})?
+		(({SpaceToken.kind == space})+) ?						
+		)?	
+		(				
+			((PERSONOBTAIN):varResearcherObtain)
+			({SpaceToken.kind == space})
+		)?
+		(
+			(
+				(
+				
+					({Token.string==","})?
+					({SpaceToken.kind == space})?
+					({Token.string=="/"})?
+					({Token.string=="and"})?
+					({SpaceToken.kind == space})?
+					({Token.string=="then"})?				
+				)												
+				(
+					(
+						(ACADEMIC_DEGREE)
+						(
+							{SpaceToken.kind == space}
+							{Token.string == "degree"}
+						)?
+					) :varResearcherDegree					
+				)
+			)[1,4]
+			(
+				(
+					(
+						{Token.string==","}
+					)
+					|
+					(
+						{SpaceToken.kind == space}
+						{Token.string=="and"}					
+					)					
+				)?
+				(
+					{SpaceToken.kind == space}
+					{Token.string=="then"}
+				)?			
+				(
+					(	
+						(
+							({SpaceToken.kind == space})
+							{Token.category == IN}
+						)?				
+						(
+							({SpaceToken.kind == space})
+							{Token.category == DT}
+						)?				
+						(					
+							{SpaceToken.kind == space}
+							({Lookup.majorType == academic_disciplines}):varResearcherDegreeDiscipline
+						) 
+					) |
+					(				
+						(
+							(							
+								({SpaceToken.kind == space})?
+								{Token.category == IN}
+							)?				
+							(
+								({SpaceToken.kind == space})?
+								{Token.category == DT}
+							)?						
+							(
+								({SpaceToken.kind == space})?
+								{Token.category == RB}
+							)? 
+							(
+								({SpaceToken.kind == space})?
+								{Token.category == VBN}
+							)? 												
+							({SpaceToken.kind == space}) ?
+							(INTERESTED_ORGS) : varResearcherJobOrg
+						)					
+					) |					
+					(	
+						(
+							(
+								({SpaceToken.kind == space})?
+								LOCATION_IN_BRACKETS
+							)
+							|
+							(					
+								(							
+									({SpaceToken.kind == space})?
+									{Token.category == IN}
+									({SpaceToken.kind == space})
+								)?							
+								(								
+									({SpaceToken.kind == space})?
+									{Token.category == DT} 
+									({SpaceToken.kind == space})
+								)?
+								{Location}						
+							)
+						) :varResearcherDegreeLoc
+					) |						
+					(	
+						(	
+							(	
+								({SpaceToken.kind == space})?
+								DATA_IN_BRACKETS
+							)
+							|
+							(
+								({SpaceToken.kind == space})?
+								DATE_EXPRESSION												
+							)
+						) :varResearcherDegreeDate
+					) 				
+				)	
+			)[0,8]	
+		)	
+	)
+)
+:varResearcherExp
+-->
+{
+	String s = null;
+	boolean noperson = false;
+	if(s == null && (gate.AnnotationSet)bindings.get("varResearcherDateCT") != null) s = "CT";	
+	if(s == null && (gate.AnnotationSet)bindings.get("varResearcherObtain") != null) s = "Obtain";	
+	if(s == null)
+	{	
+		s = "Unknown";		
+		noperson = true;
+	}	
+	
+	gate.AnnotationSet varResearcherDegree = (gate.AnnotationSet)bindings.get("varResearcherDegree");		
+	gate.AnnotationSet varResearcherDegreeDiscipline = (gate.AnnotationSet)bindings.get("varResearcherDegreeDiscipline");		
+	gate.AnnotationSet varResearcherDegreeOrg = (gate.AnnotationSet)bindings.get("varResearcherDegreeOrg");		
+	gate.AnnotationSet varResearcherDegreeLoc = (gate.AnnotationSet)bindings.get("varResearcherDegreeLoc");			
+	gate.AnnotationSet varResearcherDegreeLoc2 = (gate.AnnotationSet)bindings.get("varResearcherDegreeLoc");			
+	gate.AnnotationSet varResearcherDegreeDate = (gate.AnnotationSet)bindings.get("varResearcherDegreeDate");			
+	gate.AnnotationSet varResearcherDegreeDate2 = (gate.AnnotationSet)bindings.get("varResearcherDegreeDate2");			
+	
+	
+	int num = 0;
+	if(!noperson) num = 1;		
+	
+	if(varResearcherDegreeDiscipline != null) num++;
+	if(varResearcherDegreeOrg != null) num++;
+	if(varResearcherDegreeLoc != null) num++;
+	if(varResearcherDegreeLoc2 != null) num++;
+	if(varResearcherDegreeDate != null) num++;
+	if(varResearcherDegreeDate2 != null) num++;
+	if(varResearcherDegree == null) num = 0;
+	else
+	{
+		num+=varResearcherDegree.size();
+	}	
+	
+	if(num > 1)
+	{
+		gate.AnnotationSet varResearcherExpr = (gate.AnnotationSet)bindings.get("varResearcherExp");		
+	
+		if(varResearcherExpr != null)	
+		try
+		{
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","ResearcherDegreePattern"); 
+			try
+			{
+				outputAS.add(varResearcherExpr.firstNode(), varResearcherExpr.lastNode(), "ExpressionResearcherDegree" + s, features);
+			}
+			catch(Exception ex)
+			{
+			}
+		}
+		catch(Exception ex)
+		{
+		}	
+	
+		
+		gate.AnnotationSet varResearcherDegreeDateCT = (gate.AnnotationSet)bindings.get("varResearcherDegreeDateCT");		
+	
+		if(varResearcherDegreeDateCT != null)	
+		try
+		{
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","ResearcherDegreePattern"); 
+			outputAS.add(varResearcherDegreeDateCT.firstNode(), varResearcherDegreeDateCT.lastNode(), "ResearcherDateCT", features);
+		}
+		catch(Exception ex)
+		{
+		}		
+	
+		if(varResearcherDegree != null)
+		for (gate.Annotation varAnn : varResearcherDegree) 
+		{
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","ResearcherDegreePattern"); 
+			try
+			{
+				outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), "ResearcherDegree", features);
+			}
+			catch(Exception ex)
+			{
+			}
+		}
+		
+		if(varResearcherDegreeDiscipline != null)
+		for (gate.Annotation varAnn : varResearcherDegreeDiscipline) 
+		{
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","ResearcherDegreePattern"); 
+			try
+			{
+				outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), "ResearcherDiscipline", features);
+			}
+			catch(Exception ex)
+			{
+			}
+		}	
+		
+		if(varResearcherDegreeOrg != null)
+		for (gate.Annotation varAnn : varResearcherDegreeOrg) 
+		{
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","ResearcherDegreePattern"); 
+			try
+			{
+				outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), "ResearcherOrg", features);
+			}
+			catch(Exception ex)
+			{
+			}			
+		}	
+		
+		if(varResearcherDegreeLoc != null)
+		for (gate.Annotation varAnn : varResearcherDegreeLoc) 
+		{
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","ResearcherDegreePattern"); 
+			try
+			{
+				outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), "ResearcherLoc", features);
+			}
+			catch(Exception ex)
+			{
+			}			
+		}	
+		
+		if(varResearcherDegreeLoc2 != null)
+		for (gate.Annotation varAnn : varResearcherDegreeLoc2) 
+		{
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","ResearcherDegreePattern"); 
+			try
+			{
+				outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), "ResearcherLoc", features);
+			}
+			catch(Exception ex)
+			{
+			}			
+		}		
+		
+	
+		if(varResearcherDegreeDate != null)
+		for (gate.Annotation varAnn : varResearcherDegreeDate) 
+		{
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","ResearcherDegreePattern"); 
+			try
+			{
+				outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), "ResearcherDate", features);
+			}
+			catch(Exception ex)
+			{
+			}
+		}			
+		
+		if(varResearcherDegreeDate2 != null)
+		for (gate.Annotation varAnn : varResearcherDegreeDate2) 
+		{
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","ResearcherDegreePattern"); 
+			try
+			{
+				outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), "ResearcherDate", features);
+			}
+			catch(Exception ex)
+			{
+			}
+		}		
+
+	}		
+}
+
+Rule: ResearcherOrgJobPattern
+Priority: 200
+(	
+	(	
+		(		
+			((DATAOFCAREERSTATION):varResearcherDateCT)
+			({Token.kind == punctuation})?
+			(({SpaceToken.kind == space})+) ?						
+		) ?				
+		(
+			((PERSONTOBEPRESENT) :varToBePresent) |
+			((PERSONTOBEPAST) : varToBePast) |
+			((PERSONTOWORKVERBPAST) :varVerbPast)
+		) ?		
+		(
+			(
+				(
+				
+					({Token.string==","})?
+					({SpaceToken.kind == space})?
+					({Token.string=="/"})?
+					({Token.string=="and"})?
+					({SpaceToken.kind == space})?
+					({Token.string=="then"})?				
+				)												
+				(
+					(
+						(
+							({SpaceToken.kind == space})
+							{Token.category == IN}
+						)?							
+						(
+							({SpaceToken.kind == space})
+							{Token.category == DT} 
+						)?	
+						(
+							{SpaceToken.kind == space}
+							{Token.category == RB}
+						)? 
+						(
+							{SpaceToken.kind == space}
+							{Token.category == VBN}
+						)? 												
+						({SpaceToken.kind == space})?
+						(INTERESTED_ORGS) : varResearcherJobOrg
+					)					
+				)
+			)[1,4]
+			(
+				(
+					(
+						{Token.string==","}
+					)
+					|
+					(
+						{SpaceToken.kind == space}
+						{Token.string=="and"}					
+					)					
+				)?
+				(
+					{SpaceToken.kind == space}
+					{Token.string=="then"}
+				)?			
+				(
+					(	
+						(
+							({SpaceToken.kind == space})
+							{Token.category == IN}
+						)?				
+						(
+							({SpaceToken.kind == space})
+							{Token.category == DT}
+						)?				
+						(					
+							{SpaceToken.kind == space}
+							({Lookup.majorType == academic_disciplines}):varResearcherDiscipline
+						) 
+					) |					
+					(	
+						(
+							(
+								({SpaceToken.kind == space})?
+								LOCATION_IN_BRACKETS
+							)
+							|
+							(					
+								(							
+									({SpaceToken.kind == space})?
+									{Token.category == IN}
+									({SpaceToken.kind == space})
+								)?							
+								(								
+									({SpaceToken.kind == space})?
+									{Token.category == DT} 
+									({SpaceToken.kind == space})
+								)?
+								{Location}						
+							)
+						) :varResearcherLoc
+					) |						
+					(	
+						(	
+							(	
+								({SpaceToken.kind == space})?
+								DATA_IN_BRACKETS
+							)
+							|
+							(
+								({SpaceToken.kind == space})?
+								DATE_EXPRESSION												
+							)
+						) :varResearcherJobOrgDate
+					) |
+					(				
+						(
+							(
+								({SpaceToken.kind == space})?
+								{Token.category == IN}
+							)?
+							(
+								({SpaceToken.kind == space})?
+								{Token.category == DT}
+							)?	
+							(
+								({SpaceToken.kind == space})?
+								(ACADEMIC_JOB):varResearcherJob
+							)
+						)				
+					)					
+				)	
+			)[0,8]	
+		)
+	)
+):varResearcherExp
+-->
+{
+	String s = null;
+	boolean noperson = false;
+	if(s == null && (gate.AnnotationSet)bindings.get("varToBePresent") != null) s = "ToBePresent";
+	if(s == null && (gate.AnnotationSet)bindings.get("varToBePast") != null) s = "ToBePast";
+	if(s == null && (gate.AnnotationSet)bindings.get("varVerbPast") != null) s = "VerbPast";
+	if(s == null && (gate.AnnotationSet)bindings.get("varResearcherDateCT") != null) s = "CT";	
+	if(s == null)
+	{	
+		s = "Unknown";		
+		noperson = true;
+	}	
+	
+	gate.AnnotationSet varResearcherJob = (gate.AnnotationSet)bindings.get("varResearcherJob");		
+	gate.AnnotationSet varResearcherDiscipline = (gate.AnnotationSet)bindings.get("varResearcherDiscipline");		
+	gate.AnnotationSet varResearcherJobOrg = (gate.AnnotationSet)bindings.get("varResearcherJobOrg");		
+	gate.AnnotationSet varResearcherLoc = (gate.AnnotationSet)bindings.get("varResearcherLoc");			
+	gate.AnnotationSet varResearcherJobOrgDate = (gate.AnnotationSet)bindings.get("varResearcherJobOrgDate");				
+	
+	int num = 0;
+	if(!noperson) num = 1;		
+	
+	if(varResearcherJobOrgDate != null) num++;
+	if(varResearcherLoc != null) num++;	
+	if(varResearcherJob != null) num++;
+	if(varResearcherJobOrg == null) num = 0;
+	else
+	{
+		num++;
+	}	
+	
+	gate.AnnotationSet varResearcherExpr = (gate.AnnotationSet)bindings.get("varResearcherExp");		
+		
+	if(varResearcherExpr != null)	
+	try
+	{
+		gate.FeatureMap features = Factory.newFeatureMap(); 
+		features.put("rule","ResearcherOrgJobPattern"); 
+		outputAS.add(varResearcherExpr.firstNode(), varResearcherExpr.lastNode(), (num <= 1 ? "PoorExpression" : "ExpressionResearcherOrgJob" + s), features);
+	}
+	catch(Exception ex)
+	{
+	}
+	
+	if(num > 1)
+	{			
+		
+		gate.AnnotationSet varResearcherDateCT = (gate.AnnotationSet)bindings.get("varResearcherDateCT");		
+	
+		if(varResearcherDateCT != null)	
+		try
+		{
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","ResearcherOrgJobPattern"); 
+			outputAS.add(varResearcherDateCT.firstNode(), varResearcherDateCT.lastNode(), "ResearcherDateCT", features);
+		}
+		catch(Exception ex)
+		{
+		}	
+		
+		if(varResearcherJob != null)
+		for (gate.Annotation varAnn : varResearcherJob) 
+		{
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","ResearcherOrgJobPattern"); 
+			try
+			{
+				outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), "ResearcherJob", features);
+			}
+			catch(Exception ex)
+			{
+			}
+		}	
+		
+		if(varResearcherDiscipline != null)
+		for (gate.Annotation varAnn : varResearcherDiscipline) 
+		{
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","ResearcherOrgJobPattern"); 
+			try
+			{
+				outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), "ResearcherDiscipline", features);
+			}
+			catch(Exception ex)
+			{
+			}
+		}		
+		
+		if(varResearcherJobOrg != null)
+		for (gate.Annotation varAnn : varResearcherJobOrg) 
+		{
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","ResearcherOrgJobPattern"); 
+			try
+			{
+				outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), "ResearcherOrg", features);
+			}
+			catch(Exception ex)
+			{
+			}			
+		}	
+		
+		if(varResearcherLoc != null)
+		for (gate.Annotation varAnn : varResearcherLoc) 
+		{
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","ResearcherOrgJobPattern"); 
+			try
+			{
+				outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), "ResearcherLoc", features);
+			}
+			catch(Exception ex)
+			{
+			}			
+		}		
+	
+		
+		
+		if(varResearcherJobOrgDate != null)
+		for (gate.Annotation varAnn : varResearcherJobOrgDate) 
+		{
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","ResearcherOrgJobPattern"); 
+			try
+			{
+				outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), "ResearcherDate", features);
+			}
+			catch(Exception ex)
+			{
+			}			
+		}	
+		
+	
+	
+	
+	}
+
+	
+}
+
+
+/*
+
+		(
+			(
+				(
+					({Token.string==","})?
+					({SpaceToken.kind == space})?
+					({Token.string=="and"})?
+					({SpaceToken.kind == space})?
+					({Token.string=="then"})?
+				)		
+				(
+					({Token.string==","})?	
+					(
+						(ACADEMIC_DEGREE)
+						(
+							{SpaceToken.kind == space}
+							{Token.string == "degree"}
+						)?
+					) :varResearcherDegree
+				)
+				(	
+					(
+						(
+							{Token.string==","}
+						)?	
+						(
+							{SpaceToken.kind == space}
+							{Token.string=="and"}
+						)?	
+						(
+							(
+								({SpaceToken.kind == space})
+								{Token.category == IN}
+							)?				
+							(
+								({SpaceToken.kind == space})
+								{Token.category == DT}
+							)?				
+							(
+							
+								{SpaceToken.kind == space}
+								({Lookup.majorType == academic_disciplines}):varResearcherDegreeDiscipline
+							) 
+						)
+					)+
+				)?
+				(					
+					({SpaceToken.kind == space})?
+					(
+						LOCATION_IN_BRACKETS
+						|
+						(					
+							(								
+								{Token.category == IN}
+								({SpaceToken.kind == space})
+							)?							
+							(								
+								{Token.category == DT} 
+								({SpaceToken.kind == space})
+							)?
+							{Location}						
+						)
+					) :varResearcherDegreeLoc
+				)?			
+				(	
+					({SpaceToken.kind == space})?
+					(							
+						DATA_IN_BRACKETS
+						|
+						DATE_EXPRESSION
+					) :varResearcherDegreeDate
+				)?					
+			)+
+			(
+				(
+					({Token.string==","})?	
+					(
+							({SpaceToken.kind == space})
+							{Token.category == IN}
+					)?				
+					(
+						({SpaceToken.kind == space})
+						{Token.category == DT}
+					)?				
+					(
+						{SpaceToken.kind == space}
+						(INTERESTED_ORGS):varResearcherDegreeOrg
+					)
+				)?	
+				(					
+					({SpaceToken.kind == space})?
+					(
+						LOCATION_IN_BRACKETS
+						|
+						(					
+							(								
+								{Token.category == IN}
+								({SpaceToken.kind == space})
+							)?							
+							(								
+								{Token.category == DT} 
+								({SpaceToken.kind == space})
+							)?
+							{Location}						
+						)
+					) :varResearcherDegreeLoc2
+				)?		
+				(	
+					({SpaceToken.kind == space})?
+					(							
+						DATA_IN_BRACKETS
+						|
+						DATE_EXPRESSION
+					) :varResearcherDegreeDate2
+				)?			
+			)*
+		)+		
+		
+(	
+	(
+		(		
+		((DATAOFCAREERSTATION):varResearcherDegreeDateCT)
+		({Token.kind == punctuation})?
+		(({SpaceToken.kind == space})+) ?						
+		)?	
+		(				
+			((PERSONOBTAIN):varResearcherObtain)
+			({SpaceToken.kind == space})
+		)?
+		(
+			(
+				(
+					({Token.string==","})?
+					({SpaceToken.kind == space})?
+					({Token.string=="and"})?
+					({SpaceToken.kind == space})?
+					({Token.string=="then"})?
+				)		
+				(
+					({Token.string==","})?	
+					(
+						(ACADEMIC_DEGREE)
+						(
+							{SpaceToken.kind == space}
+							{Token.string == "degree"}
+						)?
+					) :varResearcherDegree
+				)
+				(	
+					({Token.string==","})?	
+					(
+						(
+							({SpaceToken.kind == space})
+							{Token.category == IN}
+						)?				
+						(
+							({SpaceToken.kind == space})
+							{Token.category == DT}
+						)?				
+						(
+						
+							{SpaceToken.kind == space}
+							({Lookup.majorType == academic_disciplines}):varResearcherDegreeDiscipline
+						) 
+					)
+				)?
+				(					
+					({SpaceToken.kind == space})?
+					(
+						LOCATION_IN_BRACKETS
+						|
+						(					
+							(								
+								{Token.category == IN}
+								({SpaceToken.kind == space})
+							)?							
+							(								
+								{Token.category == DT} 
+								({SpaceToken.kind == space})
+							)?
+							{Location}						
+						)
+					) :varResearcherDegreeLoc
+				)?			
+				(	
+					({SpaceToken.kind == space})?
+					(							
+						DATA_IN_BRACKETS
+						|
+						DATE_EXPRESSION
+					) :varResearcherDegreeDate
+				)?					
+			)+
+			(
+				(
+					({Token.string==","})?	
+					(
+							({SpaceToken.kind == space})
+							{Token.category == IN}
+					)?				
+					(
+						({SpaceToken.kind == space})
+						{Token.category == DT}
+					)?				
+					(
+						{SpaceToken.kind == space}
+						(INTERESTED_ORGS):varResearcherDegreeOrg
+					)
+				)?	
+				(					
+					({SpaceToken.kind == space})?
+					(
+						LOCATION_IN_BRACKETS
+						|
+						(					
+							(								
+								{Token.category == IN}
+								({SpaceToken.kind == space})
+							)?							
+							(								
+								{Token.category == DT} 
+								({SpaceToken.kind == space})
+							)?
+							{Location}						
+						)
+					) :varResearcherDegreeLoc2
+				)?		
+				(	
+					({SpaceToken.kind == space})?
+					(							
+						DATA_IN_BRACKETS
+						|
+						DATE_EXPRESSION
+					) :varResearcherDegreeDate2
+				)?			
+			)*
+		)+		
+	)
+)
+*/
+
+Rule: ExpressionMovOrgLocDate
+priority:190
+(
+		({Token.root == "return"} | {Token.root == "move"})
+		{SpaceToken.kind == space}
+		{Token.category == TO}	
+		(	
+			({SpaceToken.kind == space})?
+			(			
+				(		
+					(
+						({Token.category == IN})
+						({SpaceToken.kind == space})
+					)?
+					(						
+						{Token.category == DT}
+						({SpaceToken.kind == space})
+					)?					
+					(INTERESTED_ORGS):varResearcherReturnOrg				
+				)
+			)					
+		)?	
+		(					
+			({SpaceToken.kind == space})?
+			(			
+				(					
+					(
+						({Token.category == IN})
+						({SpaceToken.kind == space})
+					)?
+					(						
+						{Token.category == DT}
+						({SpaceToken.kind == space})
+					)?					
+					{Location}						
+				)
+			) :varResearcherReturnLoc
+		)?			
+		(					
+			({SpaceToken.kind == space})?
+			({Token.category == IN})?
+			({SpaceToken.kind == space})?			
+			(			
+				(					
+					DATA_IN_BRACKETS
+					|
+					DATE_EXPRESSION					
+				)
+			) :varResearcherReturnDate
+		)?	
+)
+:varResearcherExp
+-->
+{	
+
+		gate.AnnotationSet varResearcherReturnOrg = (gate.AnnotationSet)bindings.get("varResearcherReturnOrg");		
+		gate.AnnotationSet varResearcherReturnLoc = (gate.AnnotationSet)bindings.get("varResearcherReturnLoc");		
+		gate.AnnotationSet varResearcherReturnDate = (gate.AnnotationSet)bindings.get("varResearcherReturnDate");	
+		gate.AnnotationSet varResearcherExp = (gate.AnnotationSet)bindings.get("varResearcherExp");		
+	
+		if(varResearcherExp != null)	
+		try
+		{
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","ExpressionMovOrgLocDate"); 
+			try
+			{
+				outputAS.add(varResearcherExp.firstNode(), varResearcherExp.lastNode(), "ExpressionMovOrgLocDate", features);
+			}
+			catch(Exception ex)
+			{
+			}
+		}
+		catch(Exception ex)
+		{
+		}	
+		
+		if(varResearcherReturnOrg != null)
+		for (gate.Annotation varAnn : varResearcherReturnOrg) 
+		{
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","ExpressionMovOrgLocDate"); 
+			try
+			{
+				outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), "ResearcherOrg", features);
+			}
+			catch(Exception ex)
+			{
+			}			
+		}		
+		
+		if(varResearcherReturnLoc != null)
+		for (gate.Annotation varAnn : varResearcherReturnLoc) 
+		{
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","ExpressionMovOrgLocDate"); 
+			try
+			{
+				outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), "ResearcherLoc", features);
+			}
+			catch(Exception ex)
+			{
+			}			
+		}				
+		
+		if(varResearcherReturnDate != null)
+		for (gate.Annotation varAnn : varResearcherReturnDate) 
+		{
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","ExpressionMovOrgLocDate"); 
+			try
+			{
+				outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), "ResearcherDate", features);
+			}
+			catch(Exception ex)
+			{
+			}			
+		}	
+}
+
+/*
+(			
+			({Token.string == "and"})				
+			({SpaceToken.kind == space})		
+		)?
+	(		
+		({Date})
+	)	*/
+
+
+Rule: ExpressionPublication
+priority:220
+(
+	(			
+		(		
+			({SpaceToken.kind == space})	
+			({Token.string == "and"})				
+			({SpaceToken.kind == space})	
+		)? 		
+		({Person})		
+		(		
+			({Token.kind == punctuation})
+			({SpaceToken.kind == space})
+		)? 		
+	)+	
+	(		
+		({Date})
+	)
+)
+:varResearcherExp
+-->
+{
+	gate.AnnotationSet varResearcherExp = (gate.AnnotationSet)bindings.get("varResearcherExp");		
+
+	if(varResearcherExp != null)	
+	try
+	{
+		gate.FeatureMap features = Factory.newFeatureMap(); 
+		features.put("rule","ExpressionMovOrgLocDate"); 
+		try
+		{
+			outputAS.add(varResearcherExp.firstNode(), varResearcherExp.lastNode(), "ExpressionPublication", features);
+		}
+		catch(Exception ex)
+		{
+		}
+	}
+	catch(Exception ex)
+	{
+	}	
+}
+

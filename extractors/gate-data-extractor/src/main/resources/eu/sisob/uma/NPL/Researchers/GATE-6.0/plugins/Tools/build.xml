@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project basedir="." default="build" name="tools">
+  <!-- Prevent Ant from warning about includeantruntime not being set -->
+  <property name="build.sysclasspath" value="ignore" />
+
+  <property name="jdk.home" value="${JAVA_HOME}"/>
+  <property name="dest" value="classes"/>
+  <property name="gatehome" value="../.."/>
+  <property name="src" value="src"/>
+  <property name="doc.dir" location="doc" />
+  <property name="javadoc.dir" location="${doc.dir}/javadoc" />
+
+  <fileset id="gatelib.classpath" dir="${gatehome}/lib">
+    <include name="*.jar"/>
+    <include name="*.zip"/>
+  </fileset>
+
+  <fileset id="gate.classpath" dir="${gatehome}/bin">
+    <include name="*.jar"/>
+    <include name="*.zip"/>
+  </fileset>
+
+  <path id="compile.classpath">
+	<fileset refid="gatelib.classpath"/>
+	<fileset refid="gate.classpath"/>
+  </path>
+
+  <target name="jar" depends="compile">
+    <jar compress="false" destfile="tools.jar">
+      <fileset dir="${dest}"/>
+    </jar>
+  </target>
+
+
+  <target name="compile" depends="init">
+    <javac classpathref="compile.classpath" debug="true" deprecation="true" destdir="${dest}" nowarn="false">
+      <src path="${src}"/>
+    </javac>
+  </target>
+
+  <!-- Build JavaDoc documentation -->
+  <target name="doc.prepare">
+    <mkdir dir="${javadoc.dir}" />
+  </target>
+
+  <target name="javadoc" depends="doc.prepare">
+    <javadoc destdir="${javadoc.dir}" packagenames="*"
+             classpathref="compile.classpath"
+             encoding="UTF-8"
+             windowtitle="${plugin.name} JavaDoc"
+             source="1.5">
+      <sourcepath>
+        <pathelement location="${src}" />
+      </sourcepath>
+      <link href="http://java.sun.com/j2se/1.5.0/docs/api/" />
+      <link href="http://gate.ac.uk/gate/doc/javadoc/" />
+    </javadoc>
+  </target>
+
+  <target name="clean.classes">
+    <delete failonerror="false" includeemptydirs="true">
+      <fileset dir="${dest}"/>
+    </delete>
+  </target>
+
+  <target name="clean" depends="clean.classes">
+    <delete file="tools.jar"/>
+  </target>
+
+  <target name="init">
+    <mkdir dir="${dest}"/>
+  </target>
+
+  <!-- targets required by the top-level build file -->
+  <target name="build" depends="jar"/>
+  <target name="distro.prepare" depends="clean.classes" />
+  <target name="test" />
+
+</project>

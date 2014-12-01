@@ -1,0 +1,7 @@
+Phase:	macros
+Input: SpaceToken Token Lookup Person Organization JobTitle Date Location
+Options: control = appelt debug = true
+
+
+
+

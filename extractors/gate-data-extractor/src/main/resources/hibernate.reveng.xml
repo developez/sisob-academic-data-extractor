@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-reverse-engineering PUBLIC "-//Hibernate/Hibernate Reverse Engineering DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-reverse-engineering-3.0.dtd">
+<hibernate-reverse-engineering>
+  <schema-selection match-catalog="sisob_dev"/>  
+  
+      <table-filter match-name="cvn_agency"/>      
+      <table-filter match-name="cvn_citation"/>    
+      <table-filter match-name="cvn_city"/>  
+      <table-filter match-name="cvn_conference"/>  
+      <table-filter match-name="cvn_conference_researcher"/>
+      <table-filter match-name="cvn_country"/>
+      <table-filter match-name="cvn_employment_break"/>
+      <table-filter match-name="cvn_entity"/>  
+      <table-filter match-name="cvn_entity_type"/>
+      <table-filter match-name="cvn_institution"/>
+      <table-filter match-name="cvn_knowledge"/>
+      <table-filter match-name="cvn_knowledge_item"/>
+      <table-filter match-name="cvn_knowledge_list"/>
+      <table-filter match-name="cvn_language"/>  
+      <table-filter match-name="cvn_nationality"/>  
+      <table-filter match-name="cvn_paper"/>      
+      <table-filter match-name="cvn_paper_institution"/>
+      <table-filter match-name="cvn_paper_researcher"/>
+      <table-filter match-name="cvn_patent"/>    
+      <table-filter match-name="cvn_patent_researcher"/>
+      <table-filter match-name="cvn_prof_activity"/>
+      <table-filter match-name="cvn_prof_activity_type"/>
+      <table-filter match-name="cvn_project"/>
+      <table-filter match-name="cvn_project_researcher"/>  
+      <table-filter match-name="cvn_region"/>
+      <table-filter match-name="cvn_researcher"/>
+      <table-filter match-name="cvn_stay"/>  
+      <table-filter match-name="cvn_supervision"/>  
+      <table-filter match-name="cvn_teaching"/>  
+      <table-filter match-name="cvn_university_study"/>
+      <table-filter match-name="cvn_university_study_name"/> 
+      <table-filter match-name="cvn_university_study_type"/> 
+        
+        <table name="cvn_papers">    
+        <foreign-key constraint-name="FK_PAPER_AGENCY">
+            <set exclude="true"/>
+        </foreign-key>  
+        </table>
+
+    <table name="cvn_paper_institution">    
+    <foreign-key constraint-name="FK_PAPER_INSTITUTION__INSTITUTION">
+        <set exclude="true"/>
+    </foreign-key>    
+    </table>    
+    
+    <table name="cvn_paper_researcher">    
+    <foreign-key constraint-name="FK_PAPER_RESEARCHER__PAPER">
+        <set exclude="true"/>
+    </foreign-key>    
+    </table>    
+    
+    <table name="cvn_conference">    
+    <foreign-key constraint-name="FK_CONFERENCE_AGENCY">
+        <set exclude="true"/>
+    </foreign-key>    
+    <foreign-key constraint-name="FK_CONFERENCE_CITY">
+        <set exclude="true"/>
+    </foreign-key>    
+    <foreign-key constraint-name="FK_CONFERENCE_COUNTRY">
+        <set exclude="true"/>
+    </foreign-key>    
+    <foreign-key constraint-name="FK_CONFERENCE_LANGUAGE">
+        <set exclude="true"/>
+    </foreign-key>    
+    <foreign-key constraint-name="FK_CONFERENCE_REGION">
+        <set exclude="true"/>
+    </foreign-key>
+    </table>
+    
+    <table name="cvn_conference_researcher">    
+    <foreign-key constraint-name="FK_conference_researcher__conference">
+        <set exclude="true"/>
+    </foreign-key>    
+    </table>    
+    
+    <table name="cvn_patent">    
+    <foreign-key constraint-name="FK_PATENT_AGENCY">
+        <set exclude="true"/>
+    </foreign-key>  
+    </table>
+    
+    <table name="cvn_patent_researcher">    
+    <foreign-key constraint-name="FK_patent_researcher__patent">
+        <set exclude="true"/>
+    </foreign-key>    
+    </table>
+    
+    <table name="cvn_project">    
+    <foreign-key constraint-name="FK_PROJECT_AGENCY">
+        <set exclude="true"/>
+    </foreign-key>  
+    </table>
+    
+    <table name="cvn_project_researcher">    
+    <foreign-key constraint-name="FK_project_researcher__project">
+        <set exclude="true"/>
+    </foreign-key>    
+    </table>
+    
+    <table name="cvn_researcher">
+    <foreign-key constraint-name="FK_researcher_agency">
+        <set exclude="true"/>
+    </foreign-key>    
+    <foreign-key constraint-name="FK_researcher_city">
+        <set exclude="true"/>
+    </foreign-key>  
+    <foreign-key constraint-name="FK_researcher_country">
+        <set exclude="true"/>
+    </foreign-key>  
+    <foreign-key constraint-name="FK_researcher_nationality">
+        <set exclude="true"/>
+    </foreign-key>  
+    <foreign-key constraint-name="FK_researcher_region">
+        <set exclude="true"/>
+    </foreign-key>
+    </table>   
+    
+    <table name="cvn_prof_activity">
+        <foreign-key constraint-name="FK_PROF_ACTIVITY_AGENCY">
+        <set exclude="true"/>
+        </foreign-key>
+        <foreign-key constraint-name="FK_PROF_ACTIVITY_CITY">
+        <set exclude="true"/>
+        </foreign-key>
+        <foreign-key constraint-name="FK_PROF_ACTIVITY_COUNTRY">
+        <set exclude="true"/>
+        </foreign-key>
+        <foreign-key constraint-name="FK_PROF_ACTIVITY_INSTITUTION">
+        <set exclude="true"/>
+        </foreign-key>
+        <foreign-key constraint-name="FK_PROF_ACTIVITY_KNOWLEDGE">
+        <set exclude="true"/>
+        </foreign-key>
+        <foreign-key constraint-name="FK_PROF_ACTIVITY_REGION">
+        <set exclude="true"/>
+        </foreign-key>
+        <foreign-key constraint-name="FK_PROF_ACTIVITY_PROF_ACTIVITY_TYPE">
+        <set exclude="true"/>
+        </foreign-key>
+        <foreign-key constraint-name="FK_ENTITY__ENTITY_TYPE">
+        <set exclude="true"/>
+        </foreign-key>
+    </table>
+    
+   
+    <table name="cvn_institution">
+    <foreign-key constraint-name="FK_INSTITUTION_ENTITY_1">
+    <set exclude="true"/>
+    </foreign-key>
+
+    <foreign-key constraint-name="FK_INSTITUTION_ENTITY_2">
+    <set exclude="true"/>
+    </foreign-key>
+
+    <foreign-key constraint-name="FK_INSTITUTION_ENTITY_3">
+    <set exclude="true"/>
+    </foreign-key>  
+    </table>
+  
+    <table name="cvn_university_study">
+    <foreign-key constraint-name="FK_UNIVERSITY_STUDY_AGENCY">
+    <set exclude="true"/>
+    </foreign-key>
+    <foreign-key constraint-name="FK_UNIVERSITY_STUDY_REGION">
+    <set exclude="true"/>
+    </foreign-key>
+    <foreign-key constraint-name="FK_UNIVERSITY_STUDY_COUNTRY">
+    <set exclude="true"/>
+    </foreign-key>
+    <foreign-key constraint-name="FK_UNIVERSITY_STUDY_INSTITUTION">
+    <set exclude="true"/>
+    </foreign-key>
+    <foreign-key constraint-name="FK_UNIVERSITY_STUDY_NAME">
+    <set exclude="true"/>
+    </foreign-key>
+    <foreign-key constraint-name="FK_UNIVERSITY_STUDY_CITY">
+    <set exclude="true"/>
+    </foreign-key>
+    <foreign-key constraint-name="FK_UNIVERSITY_STUDY_UNIVERSITY_STUDY_TYPE">
+    <set exclude="true"/>
+    </foreign-key>    
+    <!--
+    <foreign-key constraint-name="FK_UNIVERSITY_STUDY_RESEARCHER">
+    <set exclude="true"/>
+    </foreign-key>
+    -->
+    </table>
+     
+    <table name="cvn_teaching">
+    <foreign-key constraint-name="FK_TEACHING_AGENCY">
+    <set exclude="true"/>
+    </foreign-key>
+    <foreign-key constraint-name="FK_TEACHING_CITY">
+    <set exclude="true"/>
+    </foreign-key>
+    <foreign-key constraint-name="FK_TEACHING_COUNTRY">
+    <set exclude="true"/>
+    </foreign-key>
+    <foreign-key constraint-name="FK_TEACHING_INSTITUTION">
+    <set exclude="true"/>
+    </foreign-key>    
+    <foreign-key constraint-name="FK_TEACHING_REGION">
+    <set exclude="true"/>
+    </foreign-key>
+    <!--
+    <foreign-key constraint-name="FK_TEACHING_RESEARCHER">
+    <set exclude="true"/>
+    </foreign-key>
+    -->
+    </table>   
+   
+    <table name="cvn_supervision">
+    <foreign-key constraint-name="FK_SUPERVISION_AGENCY">
+    <set exclude="true"/>
+    </foreign-key>
+    <foreign-key constraint-name="FK_SUPERVISION_CITY">
+    <set exclude="true"/>
+    </foreign-key>
+    <foreign-key constraint-name="FK_SUPERVISION_REGION">
+    <set exclude="true"/>
+    </foreign-key>
+    <foreign-key constraint-name="FK_SUPERVISION_COUNTRY">
+    <set exclude="true"/>
+    </foreign-key>
+    <foreign-key constraint-name="FK_SUPERVISION_LANGUAGE">
+    <set exclude="true"/>
+    </foreign-key>
+    <!--
+    <foreign-key constraint-name="FK_SUPERVISION_RESEARCHER">
+    <set exclude="true"/>
+    </foreign-key>
+    -->
+    </table>
+     
+    <table name="cvn_stay">
+    <foreign-key constraint-name="FK_STAY_AGENCY">
+    <set exclude="true"/>
+    </foreign-key>
+    <foreign-key constraint-name="FK_STAY_INSTITUTION">
+    <set exclude="true"/>
+    </foreign-key>
+    <foreign-key constraint-name="FK_STAY_CITY">
+    <set exclude="true"/>
+    </foreign-key>
+    <foreign-key constraint-name="FK_STAY_REGION">
+    <set exclude="true"/>
+    </foreign-key>
+    <foreign-key constraint-name="FK_STAY_COUNTRY">
+    <set exclude="true"/>
+    </foreign-key>
+    <!--
+    <foreign-key constraint-name="FK_STAY_RESEARCHER">
+    <set exclude="true"/>
+    </foreign-key>
+    -->
+    </table>
+    
+    
+    <table name="cvn_employment_break">
+    <foreign-key constraint-name="FK_EMPLOYMENT_BREAK_AGENCY">
+    <set exclude="true"/>
+    </foreign-key>
+    <!--
+    <foreign-key constraint-name="FK_EMPLOYMENT_BREAK_RESEARCHER">
+    <set exclude="true"/>
+    </foreign-key>
+    -->
+    </table>
+        
+</hibernate-reverse-engineering>

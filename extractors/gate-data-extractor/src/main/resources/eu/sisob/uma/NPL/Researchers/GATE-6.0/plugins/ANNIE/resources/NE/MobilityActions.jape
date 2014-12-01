@@ -1,0 +1,502 @@
+/*
+*  MobilityActions.jape
+*
+* Copyright (c) 1998-2004, The University of Sheffield.
+*
+*  This file is part of GATE (see http://gate.ac.uk/), and is free
+*  software, licenced under the GNU Library General Public License,
+*  Version 2, June 1991 (in the distribution as file licence.html,
+*  and also available at http://gate.ac.uk/gate/licence.html).
+*
+*  Diana Maynard, 10 Sep 2001
+* 
+*  $Id: MobilityActions.jape 13147 2010-10-15 08:30:24Z markagreenwood $
+*/
+
+Phase:	MobilityActions
+Input: Split Token Lookup Person Organization JobTitle Date Location
+Options: control = appelt debug = true
+
+Macro: GENERAL_PREFIX
+(		
+	(		
+		{Token.kind == word}		
+	)[1,4]	
+	({Token.kind == punctuation})?
+	(NEW_LINE)
+)
+
+
+Macro: CV_PREFIX
+(	
+	(
+		(
+			{Token.string == "Scientific"} 			
+			{Token.string == "Vita"}
+		) |
+		(
+			{Token.string == "Curriculum"} 			
+			{Token.string == "Vitae"}
+		) |
+		(				
+			{Token.string == "Career"}
+		) |
+		(				
+			{Token.string == "Education"}
+		) |
+		(				
+			{Token.string == "Biography"}
+		)
+	)
+	({Token.kind == punctuation})?
+	(NEW_LINE)
+)
+
+Macro: MOBILITY_VERBS
+(		
+	(
+		({Token.root == also})?
+		({Token.root == "after"})?
+		({Token.root == "before"})?
+		({Token.root == "move"} | {Token.root == "return"})
+		({Token.category == TO})?
+		({Token.category == "PRP$"})?	
+	 )	
+)
+
+Macro: MOBILITY_SAME_ENTITY_SEPARATOR_1_1
+(
+	({Token.string==","})?
+	({Token.string == "("} | {Token.string == "/"} | {Token.string == "-"})?
+	({Token.category== CC})?
+	({Token.string=="then"})?
+	({Token.category == IN})?
+	({Token.category == DT})?	
+)
+
+/*
+Rule: ExpressionMovOrgLocDate
+Priority:190
+(
+		(
+			({Date})
+		)?		
+		(
+			({Token.category == PRP} | {Person})
+			
+		)?
+		({Token.root == "return"} | {Token.root == "move"} | {Token.root == "join"})		
+		({Token.category == TO})?	
+		(	
+			
+			(			
+				(		
+					(
+						({Token.category == IN})
+						
+					)?
+					(						
+						{Token.category == DT}
+						
+					)?					
+					({Organization}):varResearcherReturnOrg				
+				)
+			)					
+		)?	
+		(	
+			({Token.string==","})?
+			
+			(			
+				(					
+					(
+						({Token.category == IN})
+						
+					)?
+					(						
+						{Token.category == DT}
+						
+					)?					
+					{Location}						
+				)
+			) :varResearcherReturnLoc
+		)?			
+		(								
+			({Token.category == IN})?						
+			({Date}) :varResearcherReturnDate
+		)?	
+)
+:varResearcherExp
+-->
+{	
+
+		gate.AnnotationSet varResearcherReturnOrg = (gate.AnnotationSet)bindings.get("varResearcherReturnOrg");		
+		gate.AnnotationSet varResearcherReturnLoc = (gate.AnnotationSet)bindings.get("varResearcherReturnLoc");		
+		gate.AnnotationSet varResearcherReturnDate = (gate.AnnotationSet)bindings.get("varResearcherReturnDate");	
+		gate.AnnotationSet varResearcherExp = (gate.AnnotationSet)bindings.get("varResearcherExp");		
+		
+		String sPrefix = "ExpMov";
+		String namePattern = "ExpressionMovOrgLocDate";
+		gate.AnnotationSet annSetAux = null;
+		String nameAnn = "";
+		
+		if(varResearcherExp != null)	
+		try
+		{
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","ExpressionMovOrgLocDate"); 
+			try
+			{
+				outputAS.add(varResearcherExp.firstNode(), varResearcherExp.lastNode(), "Whole" + sPrefix, features);
+			}
+			catch(Exception ex)
+			{
+			}
+		}
+		catch(Exception ex)
+		{
+		}	
+		
+        annSetAux = varResearcherReturnOrg;
+		nameAnn = sPrefix + "_" + "Org";
+		if(annSetAux != null)
+		{			
+			for (gate.Annotation varAnn : annSetAux) 
+			{
+				gate.FeatureMap features = Factory.newFeatureMap(); 
+				features.put("rule",namePattern); 
+				Object orgType = varAnn.getFeatures().get("orgType");
+				if((orgType != null) &&
+				   !(orgType.equals("school") | 
+				     orgType.equals("dept") ))
+				   orgType = null;
+				try
+				{
+					outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), nameAnn + (orgType != null ? "_" + orgType.toString() : ""), features);
+				}
+				catch(Exception ex)
+				{
+				}			
+			}			
+			
+		}
+
+		annSetAux = varResearcherReturnLoc;
+		nameAnn = sPrefix + "_" + "Loc";
+		if(annSetAux != null)
+		{
+			for (gate.Annotation varAnn : annSetAux) 
+			{
+				gate.FeatureMap features = Factory.newFeatureMap(); 
+				features.put("rule",namePattern); 
+				Object orgType = varAnn.getFeatures().get("locType");
+				if(
+					(orgType != null) &&
+					!(orgType.equals("city") | 
+				      orgType.equals("country"))
+					)
+				   orgType = null;
+				try
+				{
+					outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), nameAnn + (orgType != null ? "_" + orgType.toString() : "_region"), features);
+				}
+				catch(Exception ex)
+				{
+				}			
+			}
+		}		
+		
+		if(varResearcherReturnDate != null)
+		for (gate.Annotation varAnn : varResearcherReturnDate) 
+		{
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule","ExpressionMovOrgLocDate"); 
+			try
+			{
+				outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), sPrefix + "_" + "Date", features);
+			}
+			catch(Exception ex)
+			{
+			}			
+		}	
+}
+
+*/
+
+Rule: ResearcherWasBornPattern
+(	
+
+	(	
+		(PERSONWASBORN)
+		(
+			
+			{Token.category == IN}
+		)
+		(
+			(			
+				(				 
+					
+					({Token.string==","}) 
+					|
+					({Token.string=="/"})
+				)						
+				({Location}) :varLoc
+			)			
+		)+
+	)
+): varResearcherExp
+-->
+{
+	String sPrefix = "ExpBorn";
+	
+	gate.AnnotationSet varResearcherExpr = (gate.AnnotationSet)bindings.get("varResearcherExp");		
+	
+	if(varResearcherExpr != null)	
+	try
+	{
+		gate.FeatureMap features = Factory.newFeatureMap(); 
+		features.put("rule","ResearcherOrgJobPattern"); 
+		outputAS.add(varResearcherExpr.firstNode(), varResearcherExpr.lastNode(), "Whole" + sPrefix, features);
+	}
+	catch(Exception ex)
+	{
+	}
+		
+	gate.AnnotationSet varResearchBornLoc = (gate.AnnotationSet)bindings.get("varLoc");					
+	
+	if(varResearchBornLoc != null)
+	for (gate.Annotation varAnn : varResearchBornLoc) 
+	{
+		gate.FeatureMap features = Factory.newFeatureMap(); 
+		features.put("rule","ResearcherOrgJobPattern"); 
+		try
+		{
+			outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), sPrefix + "_Loc", features);
+		}
+		catch(Exception ex)
+		{
+		}
+	}			
+}
+
+Rule: MobilityEvents1
+Priority: 300
+(
+	(
+        (
+			(
+				({Token.string=="In"} | {Token.string=="From"})			
+				(({Date}):varDateCT)
+				({Token.string==","})						
+			)
+			|
+			(
+				(({Date}):varDateCT)
+				({Token.string=="-"})?			
+				({Token.string==":"})?			
+			)
+		)? 		
+		(			
+			(({Token.category == PRP} | {Person}))?
+		) 
+		(   
+			(	
+				(MOBILITY_VERBS)
+				(
+					(								
+						(
+							(MOBILITY_SAME_ENTITY_SEPARATOR_1_1)
+							(({Organization.orgType == dept}):varOrgDept)
+							(ENTITY_SEPARATOR_2_2)
+						)?
+						(
+							(MOBILITY_SAME_ENTITY_SEPARATOR_1_1)
+							(({Organization.orgType == school}):varOrgSchool)
+							(ENTITY_SEPARATOR_2_2)
+						)?
+						(
+							(MOBILITY_SAME_ENTITY_SEPARATOR_1_1)
+							(({Organization.orgType != school,
+							   Organization.orgType != dept}):varOrg)
+							(ENTITY_SEPARATOR_2_2)
+						)
+					)
+					|
+					(								
+						(
+							(MOBILITY_SAME_ENTITY_SEPARATOR_1_1)
+							(({Organization.orgType != school,
+							   Organization.orgType != dept}):varOrg)
+							(ENTITY_SEPARATOR_2_2)
+						)
+						(
+							(MOBILITY_SAME_ENTITY_SEPARATOR_1_1)
+							(({Organization.orgType == school}):varOrgSchool)
+							(ENTITY_SEPARATOR_2_2)
+						)?
+						(
+							(MOBILITY_SAME_ENTITY_SEPARATOR_1_1)
+							(({Organization.orgType == dept}):varOrgDept)
+							(ENTITY_SEPARATOR_2_2)
+						)?
+					)
+					|					
+					(
+						(
+							(MOBILITY_SAME_ENTITY_SEPARATOR_1_1)
+							(({Organization.orgType == dept}):varOrgDept)
+							(ENTITY_SEPARATOR_2_2)
+						)?
+						(
+							(MOBILITY_SAME_ENTITY_SEPARATOR_1_1)
+							(({Organization.orgType == school}):varOrgSchool)
+							(ENTITY_SEPARATOR_2_2)
+						)
+					)
+					|
+					(
+						(							
+							(MOBILITY_SAME_ENTITY_SEPARATOR_1_1)
+							(({Organization.orgType == dept}):varOrgDept)
+							(ENTITY_SEPARATOR_2_2)
+							(
+								(MOBILITY_SAME_ENTITY_SEPARATOR_1_1)
+								(({Organization.orgType == dept}):varOrgGroup)
+								(ENTITY_SEPARATOR_2_2)							
+							)?
+						)
+					)					
+				)
+				(MOBILITY_SAME_ENTITY_SEPARATOR_1_1)
+				(({Date}):varDateOrg)?
+				(ENTITY_SEPARATOR_2_2)	
+			)[1,5]
+		)
+	)
+):varResearcherExp
+-->
+{
+
+	String sPrefix = "MobilityEvents";
+    String namePattern = "MobilityEvents1";
+	//System.out.println(namePattern + " FOUND");
+	boolean noperson = true;	
+	
+	List<gate.Annotation> varDateCT = null;
+	if((gate.AnnotationSet)bindings.get("varDateCT") != null)
+	{
+		varDateCT = new ArrayList((AnnotationSet)bindings.get("varDateCT"));       
+		Collections.sort(varDateCT, new OffsetComparator());
+	} 		
+	
+
+	List<gate.Annotation> varOrgDept = null;
+	if((gate.AnnotationSet)bindings.get("varOrgDept") != null)
+	{
+		varOrgDept = new ArrayList((AnnotationSet)bindings.get("varOrgDept"));       
+		Collections.sort(varOrgDept, new OffsetComparator());
+	} 	
+	
+	List<gate.Annotation> varOrgSchool = null;
+	if((gate.AnnotationSet)bindings.get("varOrgSchool") != null)
+	{
+		varOrgSchool = new ArrayList((AnnotationSet)bindings.get("varOrgSchool"));       
+		Collections.sort(varOrgSchool, new OffsetComparator());
+	} 	
+	
+	List<gate.Annotation> varOrg = null;
+	if((gate.AnnotationSet)bindings.get("varOrg") != null)
+	{
+		varOrg = new ArrayList((AnnotationSet)bindings.get("varOrg"));       
+		Collections.sort(varOrg, new OffsetComparator());
+	}	
+	
+	List<gate.Annotation> varDateOrg = null;
+	if((gate.AnnotationSet)bindings.get("varDateOrg") != null)
+	{
+		varDateOrg = new ArrayList((AnnotationSet)bindings.get("varDateOrg"));       
+		Collections.sort(varDateOrg, new OffsetComparator());
+	}	
+
+	gate.AnnotationSet varResearcherExpr = (gate.AnnotationSet)bindings.get("varResearcherExp");
+
+	String nameAnn = "";
+	String nameAnnAux = "";
+	//gate.AnnotationSet annSetAux = null;
+	List<gate.Annotation> annSetAux = null;		
+	
+	{
+		try
+		{	
+			String postfix = "";
+			
+			gate.FeatureMap features = Factory.newFeatureMap();
+			features.put("Pattern", namePattern);		
+			
+			try
+			{
+				outputAS.add(varResearcherExpr.firstNode(), varResearcherExpr.lastNode(), sPrefix + postfix, features);
+			}
+			catch(Exception ex)
+			{
+			}				
+		}
+		catch(Exception ex)
+		{
+		}
+	}
+}
+
+/*
+	(
+					(ENTITY_SEPARATOR_2_1)
+					(({Location.locType == city}):varLocCity)
+					(ENTITY_SEPARATOR_2_2)
+				)?	
+				(
+					(ENTITY_SEPARATOR_2_1)
+					(({Location.locType == country}):varLocCountry)
+					(ENTITY_SEPARATOR_2_2)
+				)?							
+				(
+					(ENTITY_SEPARATOR_2_1)
+					(({Location.locType != city,
+					   Location.locType != country}):varLocRegion)
+					(ENTITY_SEPARATOR_2_2)
+				)?		
+				(ENTITY_SEPARATOR_2_1)
+				(({Date}):varDateLoc)?
+				(ENTITY_SEPARATOR_2_2)	
+				
+	List<gate.Annotation> varLocCity = null;
+	if((gate.AnnotationSet)bindings.get("varLocCity") != null)
+	{
+		varLocCity = new ArrayList((AnnotationSet)bindings.get("varLocCity"));       
+		Collections.sort(varLocCity, new OffsetComparator());
+	} 
+
+	List<gate.Annotation> varLocCountry = null;
+	if((gate.AnnotationSet)bindings.get("varLocCountry") != null)
+	{
+		varLocCountry = new ArrayList((AnnotationSet)bindings.get("varLocCountry"));       
+		Collections.sort(varLocCountry, new OffsetComparator());
+	} 
+
+	List<gate.Annotation> varLocRegion = null;
+	if((gate.AnnotationSet)bindings.get("varLocRegion") != null)
+	{
+		varLocRegion = new ArrayList((AnnotationSet)bindings.get("varLocRegion"));       
+		Collections.sort(varLocRegion, new OffsetComparator());
+	} 
+
+	List<gate.Annotation> varDateLoc = null;
+	if((gate.AnnotationSet)bindings.get("varDateLoc") != null)
+	{
+		varDateLoc = new ArrayList((AnnotationSet)bindings.get("varDateLoc"));       
+		Collections.sort(varDateLoc, new OffsetComparator());
+	} 
+	*/
+
+
+
+
+

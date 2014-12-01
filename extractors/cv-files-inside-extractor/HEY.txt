@@ -1,0 +1,613 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+	
+
+<HTML>
+<HEAD>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+
+<!-- sets the page title -->
+
+		  <TITLE>
+			Albany Medical College: Individual Researcher
+		  </TITLE>
+		
+
+<!-- sets the page Description and keywords -->
+
+
+	<META name="description" content="Albany Medical Center">
+	<META name="KEYWORDS" content="Albany Medical Center">
+
+
+
+
+
+
+
+<LINK href="/Style/css/amc.css" rel="stylesheet" type="text/css" />
+<LINK href="/Style/css/search-box.css" rel="stylesheet" type="text/css" />
+
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<link href="/Style/css/Coldfusion.css" rel="stylesheet" type="text/css" />
+
+
+		  <title>
+			Albany Medical College Researcher: Thomas T. Andersen
+		  </title>
+
+  <META Name="Keywords" content="protein; peptide; structure-function; physical biochemistry; cancer">
+
+<LINK href="/Style/css/ResearcherLayout.css" rel="stylesheet" type="text/css" />
+
+</head>
+
+<BODY>
+
+
+<DIV id="Page">
+
+<!-- pulls the correct logo -->
+
+
+			<DIV id="logo_College">Albany Medical Center</DIV>
+
+		
+
+
+
+	<DIV class="right">
+		<DIV id="utility_nav">
+
+	
+		</DIV>
+		
+<div id="search_text">
+    &nbsp;Search
+
+	<div id="search_box">
+	<form method="get" action="/Search/index.cfm" name="search_form">
+			<input type="text" size="18" name="q" class="search_box_border" />
+			<input type="hidden" size="18" name="search_rqstd" value="1" />
+			<input type="image" src="../../images/go_neutral_01.gif" align="absmiddle"
+				onMouseOver="this.src='/images/go_mouse_over_01.gif'"
+				onMouseOut="this.src='../../images/go_neutral_01.gif'"
+				onClick="this.form.submit();">
+	</form>
+	</div> 
+</div> 
+
+	</DIV><!-- end right-->
+
+	<DIV id="top_nav">
+
+			
+<a href="/index.cfm">Home</a> / 
+
+	  
+			<a href="../../Patient/adult.cfm">Caring</a>
+			
+						
+			   / 
+			 
+
+			
+			
+			<a href="../../Academic/index.html">Educating</a>
+			
+						
+			   / 
+			 
+
+			
+			
+			<a href="../index.html">Discovering</a>
+			
+						
+			   / 
+			 
+
+			
+			
+			<a href="../../PhysicianDirectory/index.cfm">Find a Doctor</a>
+			
+						
+			   / 
+			 
+
+			
+			
+			<a href="../../PR/index.cfm">News</a>
+			
+						
+			   / 
+			 
+
+			
+			
+			<a href="../../foundation/index.cfm">Give Now</a>
+			
+						
+			   / 
+			 
+
+			
+			
+			<a href="../../hr/index-to-delete.cfm">Careers</a>
+			
+						
+			   / 
+			 
+
+			
+			
+			<a href="../../About%20Us/index.cfm">About</a>
+			
+						
+			   / 
+			 
+
+			
+			
+			<a href="../../Calendar/index.cfm">Calendar</a>
+			
+						
+			   / 
+			 
+
+			
+			
+			<a href="../../maps_directions/index.cfm">Directions</a>
+			
+						
+			   / 
+			 
+
+			
+			
+			<a href="../../ContactUs/index.cfm">Contact</a>
+			
+						
+			  
+			 
+
+			
+			
+
+
+	</DIV>
+
+
+
+<!-- include section elements -->
+
+
+
+	<div id="teal_bar">
+	<a href="../../ContactUs/College_Phone_Directory.cfm">College Phone Directory</a>
+			<a href="../../Patient/locations/index.html">Maps &amp; Directions</a>
+	</div>
+	
+<div id="Body">
+	<div id="Right_Column">	
+				<div id="right_nav">
+					<div id="sub_nav_header_left">
+						<div id="sub_nav_header">
+								
+							
+									<a href="../index.html">Discovering</a>
+									
+									<!-- sets up nav to highlight current page -->
+								<script language="javascript">
+										var thisPage = 5463;
+										function whichclass(pageid)
+										{
+											if(thisPage==pageid)
+												{
+													document.getElementById(pageid).className = "on";
+												}
+										}
+									
+									</script>
+									
+											
+						
+						
+							
+							
+							<!--<a href="" class="arrow"></a>-->
+						</div><!-- end sub_nav_header -->
+					</div><!-- end sub_nav_header-->
+					<div id="sub_nav">
+					<ul>
+						
+							
+
+
+								<li class="level1">
+								<a href="index.cfm" id="1809" class="">The Center for Cardiovascular Sciences (CCS)
+							<script language="javascript">
+								whichclass("1809");
+							</script>
+							 </a></li>
+							
+						
+							
+
+
+								<li class="level2">
+								<a href="research_landing.cfm" id="14990" class="">Research
+							<script language="javascript">
+								whichclass("14990");
+							</script>
+							 </a></li>
+							
+						
+							
+
+
+								<li class="level2">
+								<a href="graduate_program.cfm" id="14992" class="">Graduate Program
+							<script language="javascript">
+								whichclass("14992");
+							</script>
+							 </a></li>
+							
+						
+							
+
+
+								<li class="level3">
+								<a href="curriculum_phd.cfm" id="15335" class="">Ph.D. Curriculum
+							<script language="javascript">
+								whichclass("15335");
+							</script>
+							 </a></li>
+							
+						
+							
+
+
+								<li class="level3">
+								<a href="curriculum_ms.cfm" id="15336" class="">M.S. Curriculum
+							<script language="javascript">
+								whichclass("15336");
+							</script>
+							 </a></li>
+							
+						
+							
+
+
+								<li class="level3">
+								<a href="current_graduate_students.cfm" id="8531" class="">Current Students
+							<script language="javascript">
+								whichclass("8531");
+							</script>
+							 </a></li>
+							
+						
+							
+
+
+								<li class="level3">
+								<a href="ccsalumni.cfm" id="7117" class="">Alumni
+							<script language="javascript">
+								whichclass("7117");
+							</script>
+							 </a></li>
+							
+						
+							
+
+
+								<li class="level3">
+								<a href="apply_graduate.cfm" id="29722" class="">Apply To Graduate Program
+							<script language="javascript">
+								whichclass("29722");
+							</script>
+							 </a></li>
+							
+						
+							
+
+
+								<li class="level2">
+								<a href="post_doc_program.cfm" id="14993" class="">Postdoctoral Opportunities
+							<script language="javascript">
+								whichclass("14993");
+							</script>
+							 </a></li>
+							
+						
+							
+
+
+								<li class="level3">
+								<a href="Current_Postdoctoral_Fellows.cfm" id="8532" class="">Current Postdocs
+							<script language="javascript">
+								whichclass("8532");
+							</script>
+							 </a></li>
+							
+						
+							
+
+
+								<li class="level2">
+								<a href="ccs_faculty.cfm" id="5478" class="">Faculty
+							<script language="javascript">
+								whichclass("5478");
+							</script>
+							 </a></li>
+							
+						
+							
+
+
+								<li class="level2">
+								<a href="seminars.cfm" id="14994" class="">Seminars
+							<script language="javascript">
+								whichclass("14994");
+							</script>
+							 </a></li>
+							
+						
+							
+
+
+								<li class="level2">
+								<a href="newsletters.cfm" id="14995" class="">Newsletters
+							<script language="javascript">
+								whichclass("14995");
+							</script>
+							 </a></li>
+							
+						
+							
+
+
+								<li class="level2">
+								<a href="Employment_Opportunities.cfm" id="8588" class="">Employment Opportunities
+							<script language="javascript">
+								whichclass("8588");
+							</script>
+							 </a></li>
+							
+						
+							
+
+
+								<li class="level2">
+								<a href="ContactUs.cfm" id="5922" class="">Contact Us
+							<script language="javascript">
+								whichclass("5922");
+							</script>
+							 </a></li>
+							
+							
+			
+
+					</ul>
+					
+					</div><!-- end sub_nav-->
+				
+				
+			</div><!-- end right_nav-->
+</div>
+<div id="Amanda">
+	
+	<div  id="pillars"></div>
+	<div id="page_header">
+	
+	
+
+				<h2>Discovering</h2>
+
+		
+
+	
+	</div>
+	</div>
+  <div id="content">
+  
+  <div id="breadcrumbs">
+  
+      
+	  			
+	</div>
+
+
+
+
+  <div id="text">								
+            
+            	
+<h1>INDIVIDUAL RESEARCHER</h1>
+
+	<img src="/researcherbiofiles/35/andersen1.jpg" align="right" height="160">
+
+              
+<strong><i>Thomas T. Andersen 
+    		          	, Ph.D. 
+
+              </i></strong>
+              <br>
+              <i>Professor</i> <br>
+              
+
+	e-mail: <a href="mailto:anderst@mail.amc.edu">anderst@mail.amc.edu</a>
+
+              <br/>
+              <br/>
+              
+
+              <br>
+              
+              <h1>Education</h1>
+
+1978 - 
+                	
+					Ph.D. from 
+					University of Kansas 
+                    <br/>                    
+	            
+				<br/>
+
+              <BR>
+          
+
+	<h1>Current Research</h1>
+	<center><img height="363" alt="" width="382" src="/ResearcherBio/ResearcherFiles/image/andersen.jpg" /></center>
+<p><br />
+It has long been known that pregnancy is associated with a decreased risk of breast cancer. We have estimated that, if short-term administration of a drug to at-risk women would decrease their risk of breast cancer to the same extent as would the experience of pregnancy, then we could prevent as many as 50,000 cases of breast cancer every year. Alpha-fetoprotein (AFP), a protein produced by the fetal liver, is one of the agents of pregnancy that leads to a significant reduction in risk of acquiring breast cancer for women who experience term pregnancy. AFP stops the growth of estrogen-dependent human breast cancer tumors (xenografts) that have been transplanted to immune-deficient mice. AFP is non-toxic and its mechanism of action is different from that of agents currently used in the clinic to treat breast cancer, but it wouldn&rsquo;t be a very good drug because it is too large. We have designed a novel cyclic synthetic peptide, AFPep, which mimics the active site of AFP. AFPep inhibits the growth of human breast cancer cells in culture and in xenografts in mice. AFPep has a novel mechanism of action, one that is different from that of tamoxifen; in fact, AFPep is active even against tamoxifen-resistant forms of breast cancer. Recently, we have shown that AFPep can prevent cancer when administered to animals that have been exposed to a potent carcinogen. Pre-clinical studies are designed to develop this molecule into a pharmaceutical agent useful for the prevention and treatment of human breast cancer. (Cancer prevention models and toxicity models are used.) We continue to develop specialty analogs of AFPep that have important and desirable properties such as being active after oral administration (design and synthesis of peptides is the major technique). Investigations of mechanism of action include cell culture studies to investigate signaling pathways. We want to investigate whether AFPep will prevent cancers that are induced by natural hormones or those that are induced by radiation (i.e., dirty bomb levels of radiation).</p> <br/><br/>
+
+          <br/>
+
+          
+
+	<h1>References</h1>
+<ol>
+            
+	<li><a href="" target="_blank">Tower AM, Trinward A, Lee K, Joseph L, Jacobson HI, Bennett JA, Andersen TT.  AFPep, a novel drug for the prevention and treatment of breast cancer, does not disrupt the estrous cycle or fertility in rats.    Oncol Rep. 2009;22(1):49-56.   PMID: 19513504</a></li> <br/><br/>
+
+            
+	<li><a href="http://www3.interscience.wiley.com/cgi-bin/fulltext/121673524/PDFSTART" target="_blank">Joseph LC, Bennett JA, Kirschner KN, Shields GC, Hughes J, Lostritto N, Jacobson HI, Andersen TT.  Antiestrogenic and anticancer activities of peptides derived from the active site of alpha-fetoprotein.  J Pept Sci. 2009 ;15(4):319-25.  PMID: 19189271</a></li> <br/><br/>
+
+            
+	<li><a href="http://www.springerlink.com/content/5j37778362162871/fulltext.pdf" target="_blank">Bennett JA, DeFreest L, Anaka I, Saadati H, Balulad S, Jacobson HI, Andersen TT.
+AFPep: an anti-breast cancer peptide that is orally active.  Breast Cancer Res Treat. 2006;98(2):133-41. PMID: 16538538</a></li> <br/><br/>
+
+            
+	<li><a href="http://clincancerres.aacrjournals.org/content/11/23/8512.long" target="_blank">Parikh RR, Gildener-Leapman N, Narendran A, Lin HY, Lemanski N, Bennett JA, Jacobson HI, Andersen TT.   Prevention of N-methyl-N-nitrosourea-induced breast cancer by alpha-fetoprotein (AFP)-derived peptide, a peptide derived from the active site of AFP.  Clin Cancer Res. 2005;11(23):8512-20. PMID: 16322315</a></li> <br/><br/>
+
+            
+            </ol>
+            <br/>
+ 
+       
+       
+	</div>
+<!-- end page -->
+</div>
+
+
+
+</DIV>
+
+<!-- end body-->
+	<DIV id="footer">
+<P>
+
+		
+<a href="/index.cfm">Home</a> / 
+
+	  
+			<a href="../../Patient/adult.cfm">Caring</a>
+			
+						
+			   / 
+			 
+
+			
+			
+			<a href="../../Academic/index.html">Educating</a>
+			
+						
+			   / 
+			 
+
+			
+			
+			<a href="../index.html">Discovering</a>
+			
+						
+			   / 
+			 
+
+			
+			
+			<a href="../../PhysicianDirectory/index.cfm">Find a Doctor</a>
+			
+						
+			   / 
+			 
+
+			
+			
+			<a href="../../PR/index.cfm">News</a>
+			
+						
+			   / 
+			 
+
+			
+			
+			<a href="../../foundation/index.cfm">Give Now</a>
+			
+						
+			   / 
+			 
+
+			
+			
+			<a href="../../hr/index-to-delete.cfm">Careers</a>
+			
+						
+			   / 
+			 
+
+			
+			
+			<a href="../../About%20Us/index.cfm">About</a>
+			
+						
+			   / 
+			 
+
+			
+			
+			<a href="../../Calendar/index.cfm">Calendar</a>
+			
+						
+			   / 
+			 
+
+			
+			
+			<a href="../../maps_directions/index.cfm">Directions</a>
+			
+						
+			   / 
+			 
+
+			
+			
+			<a href="../../ContactUs/index.cfm">Contact</a>
+			
+						
+			  
+			 
+
+			
+			
+
+
+
+	  </P>
+
+
+		<P class="left">
+			<STRONG>Albany Medical Center</STRONG> 43 New Scotland Avenue, Albany, NY 12208 <STRONG>p / </STRONG>518.262.3125
+			<img src="/Style/css/images/spacer.gif" width="200" height="1" border="0"/>
+            <A href="/AskAQuestion/index.cfm" class="webmaster">Ask A Question</A>
+			<br />Copyright, 2002-2012, Albany Medical Center. All rights Reserved / <a href="/About%20Us/publicpolicy/web_privacy.cfm" class="webmaster">Privacy Policy</a> /
+			<a href="/About%20Us/publicpolicy/TheJointCommission.cfm" class="webmaster">Joint Commission Public Notice</a> /
+			<a href="/About%20Us/policy_fraud_waste.cfm" class="webmaster">Policy-Fraud & Abuse in Health Care</a></P>
+
+	</DIV>
+	</div>
+<!-- end page -->
+</BODY>
+</HTML>

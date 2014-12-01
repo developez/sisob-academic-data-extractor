@@ -1,0 +1,107 @@
+/*
+*  jobtitle.jape
+*
+* Copyright (c) 1998-2004, The University of Sheffield.
+*
+*  This file is part of GATE (see http://gate.ac.uk/), and is free
+*  software, licenced under the GNU Library General Public License,
+*  Version 2, June 1991 (in the distribution as file licence.html,
+*  and also available at http://gate.ac.uk/gate/licence.html).
+*
+*  Diana Maynard, 10 Sep 2001
+* 
+*  $Id: jobtitle.jape 5921 2004-07-21 17:00:37Z akshay $
+*/
+
+Phase:	Jobtitle
+Input: Lookup Token
+Options: control = appelt
+
+
+Rule: Jobtitle1
+Priority: 160
+(	
+	(	
+		{Lookup.majorType == jobtitle} 
+	)
+	(
+		{Lookup.majorType == jobtitle} 
+	)?
+	({Token.string == "position"})?	
+	({Token.root == "of"} | {Token.root == "in"})	
+	({Token.kind == word})[1,8]
+)
+:jobtitle
+-->
+ :jobtitle.JobTitleTest = {rule = "JobTitle1"} 
+ 
+Rule: Jobtitle2
+Priority: 200
+(	
+	(
+		(							
+			(
+				{Lookup.majorType == jobtitle} 			
+				
+			)
+			|
+			(
+				{Lookup.majorType == academic_disciplines}				
+			)
+		)?		
+		(			
+			{Lookup.majorType == jobtitle, Lookup.minorType == academic} 
+		)	
+		({Token.string == "position"})?
+	)
+	(
+		 ({Token.root == "of"} | {Token.root == "in"})		
+	) 	
+	({Token.kind == word})[1,8]
+)
+:jobtitle
+-->
+ :jobtitle.JobTitleTest = {rule = "JobTitle2"} 
+ 
+Rule: Jobtitle3
+Priority: 190
+(
+	(
+		(
+			{Lookup.majorType == jobtitle_pre, Lookup.minorType == academic} 
+			
+		)[1,3]		
+		(			
+			({Lookup.majorType == jobtitle, Lookup.minorType == academic} | {Token.string == "position"})
+		)		
+	)
+	(
+		 ({Token.root == "of"} | {Token.root == "in"})		    
+	) 
+	({Token.kind == word})[1,8]
+)
+:jobtitle
+-->
+ :jobtitle.JobTitleTest = {rule = "JobTitle3"} 		
+
+Rule: Jobtitle4
+Priority: 130
+( 
+	(
+		(
+			{Lookup.majorType == jobtitle_pre, Lookup.minorType == academic} 
+		)[2,3]							
+	)
+	(
+		 ({Token.root == "of"} | {Token.root == "in"})		  
+	)  
+	({Token.kind == word})[1,8]
+)
+:jobtitle
+-->
+ :jobtitle.JobTitleTest = {rule = "JobTitle4"} 
+ 
+
+
+
+

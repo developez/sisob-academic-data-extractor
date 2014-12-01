@@ -1,0 +1,123 @@
+﻿Phase: fax
+Input: Token SpaceToken 
+Options: control = appelt
+debug = true
+Macro: SPACE
+(
+	(
+	{SpaceToken.kind == space}
+	)*
+)
+
+Macro: FAX
+(
+	(
+	{Token.string == "Fax"} |
+	{Token.string == "fax"} |
+	{Token.string == "FAX"} 	
+	)
+	({Token.kind == punctuation})?
+)
+
+
+Rule:MakeFax0
+priority:20
+(
+	(
+	(FAX)
+	(SPACE)
+	)
+	(
+		(
+		{Token.string == "+"}
+		{Token.kind == number, Token.length == "2"}
+		{SpaceToken.kind == space}
+		)?
+		(
+			{Token.kind == number, Token.length == "3"}
+			(
+				(
+				 {SpaceToken.kind == space}
+				)?
+				{Token.kind == punctuation}
+			)?
+			(
+				{SpaceToken.kind == space}
+			)?
+			{Token.kind == number, Token.length == "3"}
+			{SpaceToken.kind == space}
+			{Token.kind == number, Token.length == "3"}		
+		)	
+	):varFax
+)
+-->
+:varFax.FaxResearcher = {rule="MakeFax0", kind = FaxResearcher}
+
+Rule:MakeFax2
+priority:20
+(
+	(
+	(FAX)
+	(SPACE)
+	)
+	(
+		(
+			{Token.string == "+"}
+			{Token.kind == number, Token.length == "2"}
+			{SpaceToken.kind == space}
+		)?
+		(
+			{Token.kind == number, Token.length == "9"}		
+		)
+	):varFax
+)
+-->
+:varFax.FaxResearcher = {rule="MakeFax2", kind = FaxResearcher}
+
+Rule:MakeFax3
+priority:20
+(
+	(
+	(FAX)
+	(SPACE)
+	)
+	(
+		{Token.kind == number, Token.length == "4"}		
+	):varFax
+)
+-->
+:varFax.FaxResearcher = {rule="MakeFax3", kind = FaxResearcher}
+
+
+Rule:MakeFax4
+priority:20
+(
+	(
+	(FAX)
+	(SPACE)
+	)
+	(
+		(
+		{Token.string == "+"}
+		{Token.kind == number, Token.length == "2"}
+		{SpaceToken.kind == space}
+		)?
+		(
+			{Token.kind == number, Token.length == "2"}
+			(
+				(
+				 {SpaceToken.kind == space}
+				)?
+				{Token.kind == punctuation}
+			)?
+			(
+				{SpaceToken.kind == space}
+			)?
+			{Token.kind == number, Token.length == "3"}
+			{SpaceToken.kind == space}
+			{Token.kind == number, Token.length == "4"}		
+		)	
+	):varFax
+)
+-->
+:varFax.FaxResearcher = {rule="MakeFax4", kind = FaxResearcher}

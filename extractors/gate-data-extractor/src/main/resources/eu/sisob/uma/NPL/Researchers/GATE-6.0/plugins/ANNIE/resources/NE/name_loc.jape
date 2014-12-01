@@ -1,0 +1,224 @@
+Phase:	Name_Loc
+Input: Token Lookup Title FirstPerson TempDate Split
+Options: control = appelt debug = false
+
+/////////////////////////////////////////////////////////////////
+// Location rules
+
+
+Rule: 	Location1
+Priority: 75
+// Lookup = city, country, province, region, water
+
+// Western Europe
+// South China sea
+
+(
+ ({Lookup.majorType == loc_key, Lookup.minorType == pre}
+ )?
+ {Lookup.majorType == location}
+ (
+  {Lookup.majorType == loc_key, Lookup.minorType == post})?
+)
+:locName -->
+{
+ gate.FeatureMap features = Factory.newFeatureMap();
+// create an annotation set consisting of all the annotations for org 
+gate.AnnotationSet locSet = (gate.AnnotationSet)bindings.get("locName");
+// create an annotation set consisting of the annotation matching Lookup
+gate.AnnotationSet loc = (gate.AnnotationSet)locSet.get("Lookup");
+// if the annotation type Lookup doesn't exist, do nothing
+if (loc != null && loc.size()>0)
+{
+// if it does exist, take the first element in the set
+  gate.Annotation locAnn = (gate.Annotation)loc.iterator().next();
+//propagate minorType feature (and value) from loc
+  features.put("locType", locAnn.getFeatures().get("minorType"));
+}
+// create some new features
+  features.put("rule", "Location1");
+// create a TempLoc annotation and add the features we've created
+outputAS.add(locSet.firstNode(), locSet.lastNode(), "TempLocation",
+features);
+}
+
+Rule:	GazLocation
+Priority: 90
+(
+ {Lookup.majorType == location, Lookup.minorType == country}
+)
+:locName
+ --> 	
+{
+	gate.FeatureMap features = Factory.newFeatureMap();
+	
+	gate.AnnotationSet locSet = (gate.AnnotationSet)bindings.get("locName");	
+	gate.AnnotationSet loc = (gate.AnnotationSet)locSet.get("Lookup");
+	
+	if (loc != null && loc.size()>0)
+	{		
+		gate.Annotation locAnn = (gate.Annotation)loc.iterator().next();	
+		features.put("locType", locAnn.getFeatures().get("minorType"));
+	}	
+    features.put("rule", "GazLocation");	
+	outputAS.add(locSet.firstNode(), locSet.lastNode(), "TempLocation",	features);
+}
+
+Rule:	GazLocation
+Priority: 80
+(
+ {Lookup.majorType == location, Lookup.minorType == region}
+)
+:locName
+ --> 	
+{
+	gate.FeatureMap features = Factory.newFeatureMap();
+	
+	gate.AnnotationSet locSet = (gate.AnnotationSet)bindings.get("locName");	
+	gate.AnnotationSet loc = (gate.AnnotationSet)locSet.get("Lookup");
+	
+	if (loc != null && loc.size()>0)
+	{		
+		gate.Annotation locAnn = (gate.Annotation)loc.iterator().next();	
+		features.put("locType", locAnn.getFeatures().get("minorType"));
+	}	
+    features.put("rule", "GazLocation");	
+	outputAS.add(locSet.firstNode(), locSet.lastNode(), "TempLocation",	features);
+}
+
+Rule:	GazLocation
+Priority: 70
+(
+ {Lookup.majorType == location, Lookup.minorType == city}
+)
+:locName
+ --> 	
+{
+	gate.FeatureMap features = Factory.newFeatureMap();
+	
+	gate.AnnotationSet locSet = (gate.AnnotationSet)bindings.get("locName");	
+	gate.AnnotationSet loc = (gate.AnnotationSet)locSet.get("Lookup");
+	
+	if (loc != null && loc.size()>0)
+	{		
+		gate.Annotation locAnn = (gate.Annotation)loc.iterator().next();	
+		features.put("locType", locAnn.getFeatures().get("minorType"));
+	}	
+    features.put("rule", "GazLocation");	
+	outputAS.add(locSet.firstNode(), locSet.lastNode(), "TempLocation",	features);
+}
+
+Rule:	GazLocation
+Priority: 60
+(
+ {Lookup.majorType == location}
+)
+:locName
+ --> 	
+{
+	gate.FeatureMap features = Factory.newFeatureMap();
+	
+	gate.AnnotationSet locSet = (gate.AnnotationSet)bindings.get("locName");	
+	gate.AnnotationSet loc = (gate.AnnotationSet)locSet.get("Lookup");
+	
+	if (loc != null && loc.size()>0)
+	{		
+		gate.Annotation locAnn = (gate.Annotation)loc.iterator().next();	
+		features.put("locType", locAnn.getFeatures().get("minorType"));
+	}	
+    features.put("rule", "GazLocation");	
+	outputAS.add(locSet.firstNode(), locSet.lastNode(), "TempLocation",	features);
+}
+
+/*
+Rule:	GazLocationLocation
+Priority: 100
+
+(
+ ({Lookup.majorType == location}):locName1
+ {Token.string == ","}
+ ({Lookup.majorType == location}):locName2
+) 
+--> 	
+
+{
+ gate.FeatureMap features = Factory.newFeatureMap();
+ gate.FeatureMap morefeatures = Factory.newFeatureMap();
+gate.AnnotationSet loc1Set = (gate.AnnotationSet)bindings.get("locName1");
+gate.AnnotationSet loc1 = (gate.AnnotationSet)loc1Set.get("Lookup");
+
+gate.AnnotationSet loc2Set = (gate.AnnotationSet)bindings.get("locName2");
+gate.AnnotationSet loc2 = (gate.AnnotationSet)loc2Set.get("Lookup");
+
+// if the annotation type Lookup doesn't exist, do nothing
+if (loc1 != null && loc1.size()>0)
+{
+  gate.Annotation loc1Ann = (gate.Annotation)loc1.iterator().next();
+  features.put("locType", loc1Ann.getFeatures().get("minorType"));
+}
+
+if (loc2 != null && loc2.size()>0)
+{
+  gate.Annotation loc2Ann = (gate.Annotation)loc2.iterator().next();
+  morefeatures.put("locType", loc2Ann.getFeatures().get("minorType"));
+}
+
+features.put("rule", "GazLocation");
+outputAS.add(loc1Set.firstNode(), loc1Set.lastNode(), "TempLocation", features);
+
+morefeatures.put("rule", "GazLocation");
+outputAS.add(loc2Set.firstNode(), loc2Set.lastNode(), "TempLocation", morefeatures);
+}
+*/
+
+
+Rule: LocationPost
+Priority: 50
+(
+ {Token.category == NNP}
+ {Lookup.majorType == loc_key, Lookup.minorType == post}
+)
+:locName
+-->
+ :locName.TempLocation = {kind = "locName", rule = LocationPost}
+
+Rule:LocKey
+(
+ ({Lookup.majorType == loc_key, Lookup.minorType == pre}
+ )
+ (UPPER)
+ (
+  {Lookup.majorType == loc_key, Lookup.minorType == post})?
+)
+:locName -->
+:locName.TempLocation = {kind = "locName", rule = LocKey}
+/////////////////////////////////////////////////////////////////
+
+// Context-based Rules
+
+
+Rule:InLoc1
+(
+ {Token.string == "in"}|
+ {Token.string == "to"}
+)
+(
+ {Lookup.majorType == location}
+)
+:locName
+-->
+ :locName.TempLocation = {kind = "locName", rule = InLoc1, locType = :locName.Lookup.minorType}
+
+Rule:LocGeneralKey
+Priority: 30
+(
+ {Lookup.majorType == loc_general_key}
+ {Token.root == "of"}
+)
+(
+ (UPPER)
+)
+:loc
+-->
+ :loc.TempLocation = {kind = "locName", rule = LocGeneralKey}
+

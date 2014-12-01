@@ -1,0 +1,257 @@
+A2_city.lst:location:city:A2 #Satellite Provider
+O1_city.lst:location:city:O1 #Other Country
+AD_city.lst:location:city:AD #Andorra
+AE_city.lst:location:city:AE #United Arab Emirates
+AF_city.lst:location:city:AF #Afghanistan
+AG_city.lst:location:city:AG #Antigua and Barbuda
+AI_city.lst:location:city:AI #Anguilla
+AL_city.lst:location:city:AL #Albania
+AM_city.lst:location:city:AM #Armenia
+AO_city.lst:location:city:AO #Angola
+AP_city.lst:location:city:AP #Asia/Pacific Region
+AQ_city.lst:location:city:AQ #Antarctica
+AR_city.lst:location:city:AR #Argentina
+AS_city.lst:location:city:AS #American Samoa
+AT_city.lst:location:city:AT #Austria
+AU_city.lst:location:city:AU #Australia
+AW_city.lst:location:city:AW #Aruba
+AX_city.lst:location:city:AX #Aland Islands
+AZ_city.lst:location:city:AZ #Azerbaijan
+BA_city.lst:location:city:BA #Bosnia and Herzegovina
+BB_city.lst:location:city:BB #Barbados
+BD_city.lst:location:city:BD #Bangladesh
+BE_city.lst:location:city:BE #Belgium
+BF_city.lst:location:city:BF #Burkina Faso
+BG_city.lst:location:city:BG #Bulgaria
+BH_city.lst:location:city:BH #Bahrain
+BI_city.lst:location:city:BI #Burundi
+BJ_city.lst:location:city:BJ #Benin
+BL_city.lst:location:city:BL #Saint Bartelemey
+BM_city.lst:location:city:BM #Bermuda
+BN_city.lst:location:city:BN #Brunei Darussalam
+BO_city.lst:location:city:BO #Bolivia
+BQ_city.lst:location:city:BQ #Bonaire, Saint Eustatius and Saba
+BR_city.lst:location:city:BR #Brazil
+BS_city.lst:location:city:BS #Bahamas
+BT_city.lst:location:city:BT #Bhutan
+BV_city.lst:location:city:BV #Bouvet Island
+BW_city.lst:location:city:BW #Botswana
+BY_city.lst:location:city:BY #Belarus
+BZ_city.lst:location:city:BZ #Belize
+CA_city.lst:location:city:CA #Canada
+CC_city.lst:location:city:CC #Cocos (Keeling) Islands
+CD_city.lst:location:city:CD #Congo, The Democratic Republic of the
+CF_city.lst:location:city:CF #Central African Republic
+CG_city.lst:location:city:CG #Congo
+CH_city.lst:location:city:CH #Switzerland
+CI_city.lst:location:city:CI #Cote d'Ivoire
+CK_city.lst:location:city:CK #Cook Islands
+CL_city.lst:location:city:CL #Chile
+CM_city.lst:location:city:CM #Cameroon
+CN_city.lst:location:city:CN #China
+CO_city.lst:location:city:CO #Colombia
+CR_city.lst:location:city:CR #Costa Rica
+CU_city.lst:location:city:CU #Cuba
+CV_city.lst:location:city:CV #Cape Verde
+CW_city.lst:location:city:CW #Curacao
+CX_city.lst:location:city:CX #Christmas Island
+CY_city.lst:location:city:CY #Cyprus
+CZ_city.lst:location:city:CZ #Czech Republic
+DE_city.lst:location:city:DE #Germany
+DJ_city.lst:location:city:DJ #Djibouti
+DK_city.lst:location:city:DK #Denmark
+DM_city.lst:location:city:DM #Dominica
+DO_city.lst:location:city:DO #Dominican Republic
+DZ_city.lst:location:city:DZ #Algeria
+EC_city.lst:location:city:EC #Ecuador
+EE_city.lst:location:city:EE #Estonia
+EG_city.lst:location:city:EG #Egypt
+EH_city.lst:location:city:EH #Western Sahara
+ER_city.lst:location:city:ER #Eritrea
+ES_city.lst:location:city:ES #Spain
+ET_city.lst:location:city:ET #Ethiopia
+EU_city.lst:location:city:EU #Europe
+FI_city.lst:location:city:FI #Finland
+FJ_city.lst:location:city:FJ #Fiji
+FK_city.lst:location:city:FK #Falkland Islands (Malvinas)
+FM_city.lst:location:city:FM #Micronesia, Federated States of
+FO_city.lst:location:city:FO #Faroe Islands
+FR_city.lst:location:city:FR #France
+GA_city.lst:location:city:GA #Gabon
+GB_city.lst:location:city:GB #United Kingdom
+GB_city.lst:location:city:GB #United Kingdom, with Dependencies and Territories
+GD_city.lst:location:city:GD #Grenada
+GE_city.lst:location:city:GE #Georgia
+GF_city.lst:location:city:GF #French Guiana
+GG_city.lst:location:city:GG #Guernsey
+GH_city.lst:location:city:GH #Ghana
+GI_city.lst:location:city:GI #Gibraltar
+GL_city.lst:location:city:GL #Greenland
+GM_city.lst:location:city:GM #Gambia
+GN_city.lst:location:city:GN #Guinea
+GP_city.lst:location:city:GP #Guadeloupe
+GQ_city.lst:location:city:GQ #Equatorial Guinea
+GR_city.lst:location:city:GR #Greece
+GS_city.lst:location:city:GS #South Georgia and the South Sandwich Islands
+GT_city.lst:location:city:GT #Guatemala
+GU_city.lst:location:city:GU #Guam
+GW_city.lst:location:city:GW #Guinea-Bissau
+GY_city.lst:location:city:GY #Guyana
+HK_city.lst:location:city:HK #Hong Kong
+HM_city.lst:location:city:HM #Heard Island and McDonald Islands
+HN_city.lst:location:city:HN #Honduras
+HR_city.lst:location:city:HR #Croatia
+HT_city.lst:location:city:HT #Haiti
+HU_city.lst:location:city:HU #Hungary
+ID_city.lst:location:city:ID #Indonesia
+IE_city.lst:location:city:IE #Ireland
+IE_city.lst:location:city:IE #Republic of Ireland
+IL_city.lst:location:city:IL #Israel
+IM_city.lst:location:city:IM #Isle of Man
+IN_city.lst:location:city:IN #India
+IO_city.lst:location:city:IO #British Indian Ocean Territory
+IQ_city.lst:location:city:IQ #Iraq
+IR_city.lst:location:city:IR #Iran, Islamic Republic of
+IR_city.lst:location:city:IR #Iran
+IS_city.lst:location:city:IS #Iceland
+IT_city.lst:location:city:IT #Italy
+JE_city.lst:location:city:JE #Jersey
+JM_city.lst:location:city:JM #Jamaica
+JO_city.lst:location:city:JO #Jordan
+JP_city.lst:location:city:JP #Japan
+KE_city.lst:location:city:KE #Kenya
+KG_city.lst:location:city:KG #Kyrgyzstan
+KH_city.lst:location:city:KH #Cambodia
+KI_city.lst:location:city:KI #Kiribati
+KM_city.lst:location:city:KM #Comoros
+KN_city.lst:location:city:KN #Saint Kitts and Nevis
+KP_city.lst:location:city:KP #Korea, Democratic People's Republic of
+KR_city.lst:location:city:KR #Korea, Republic of
+KW_city.lst:location:city:KW #Kuwait
+KY_city.lst:location:city:KY #Cayman Islands
+KZ_city.lst:location:city:KZ #Kazakhstan
+LA_city.lst:location:city:LA #Lao People's Democratic Republic
+LB_city.lst:location:city:LB #Lebanon
+LC_city.lst:location:city:LC #Saint Lucia
+LI_city.lst:location:city:LI #Liechtenstein
+LK_city.lst:location:city:LK #Sri Lanka
+LR_city.lst:location:city:LR #Liberia
+LS_city.lst:location:city:LS #Lesotho
+LT_city.lst:location:city:LT #Lithuania
+LU_city.lst:location:city:LU #Luxembourg
+LV_city.lst:location:city:LV #Latvia
+LY_city.lst:location:city:LY #Libyan Arab Jamahiriya
+MA_city.lst:location:city:MA #Morocco
+MC_city.lst:location:city:MC #Monaco
+MD_city.lst:location:city:MD #Moldova, Republic of
+ME_city.lst:location:city:ME #Montenegro
+MF_city.lst:location:city:MF #Saint Martin
+MG_city.lst:location:city:MG #Madagascar
+MH_city.lst:location:city:MH #Marshall Islands
+MK_city.lst:location:city:MK #Macedonia
+ML_city.lst:location:city:ML #Mali
+MM_city.lst:location:city:MM #Myanmar
+MN_city.lst:location:city:MN #Mongolia
+MO_city.lst:location:city:MO #Macao
+MP_city.lst:location:city:MP #Northern Mariana Islands
+MQ_city.lst:location:city:MQ #Martinique
+MR_city.lst:location:city:MR #Mauritania
+MS_city.lst:location:city:MS #Montserrat
+MT_city.lst:location:city:MT #Malta
+MU_city.lst:location:city:MU #Mauritius
+MV_city.lst:location:city:MV #Maldives
+MW_city.lst:location:city:MW #Malawi
+MX_city.lst:location:city:MX #Mexico
+MY_city.lst:location:city:MY #Malaysia
+MZ_city.lst:location:city:MZ #Mozambique
+NA_city.lst:location:city:NA #Namibia
+NC_city.lst:location:city:NC #New Caledonia
+NE_city.lst:location:city:NE #Niger
+NF_city.lst:location:city:NF #Norfolk Island
+NG_city.lst:location:city:NG #Nigeria
+NI_city.lst:location:city:NI #Nicaragua
+NL_city.lst:location:city:NL #Netherlands
+NO_city.lst:location:city:NO #Norway
+NP_city.lst:location:city:NP #Nepal
+NR_city.lst:location:city:NR #Nauru
+NU_city.lst:location:city:NU #Niue
+NZ_city.lst:location:city:NZ #New Zealand
+OM_city.lst:location:city:OM #Oman
+PA_city.lst:location:city:PA #Panama
+PE_city.lst:location:city:PE #Peru
+PF_city.lst:location:city:PF #French Polynesia
+PG_city.lst:location:city:PG #Papua New Guinea
+PH_city.lst:location:city:PH #Philippines
+PK_city.lst:location:city:PK #Pakistan
+PL_city.lst:location:city:PL #Poland
+PM_city.lst:location:city:PM #Saint Pierre and Miquelon
+PN_city.lst:location:city:PN #Pitcairn
+PR_city.lst:location:city:PR #Puerto Rico
+PS_city.lst:location:city:PS #Palestinian Territory
+PT_city.lst:location:city:PT #Portugal
+PW_city.lst:location:city:PW #Palau
+PY_city.lst:location:city:PY #Paraguay
+QA_city.lst:location:city:QA #Qatar
+RE_city.lst:location:city:RE #Reunion
+RO_city.lst:location:city:RO #Romania
+RS_city.lst:location:city:RS #Serbia
+RU_city.lst:location:city:RU #Russian Federation
+RU_city.lst:location:city:RU #Russia
+RW_city.lst:location:city:RW #Rwanda
+SA_city.lst:location:city:SA #Saudi Arabia
+SB_city.lst:location:city:SB #Solomon Islands
+SC_city.lst:location:city:SC #Seychelles
+SD_city.lst:location:city:SD #Sudan
+SE_city.lst:location:city:SE #Sweden
+SG_city.lst:location:city:SG #Singapore
+SH_city.lst:location:city:SH #Saint Helena
+SI_city.lst:location:city:SI #Slovenia
+SJ_city.lst:location:city:SJ #Svalbard and Jan Mayen
+SK_city.lst:location:city:SK #Slovakia
+SL_city.lst:location:city:SL #Sierra Leone
+SM_city.lst:location:city:SM #San Marino
+SN_city.lst:location:city:SN #Senegal
+SO_city.lst:location:city:SO #Somalia
+SR_city.lst:location:city:SR #Suriname
+ST_city.lst:location:city:ST #Sao Tome and Principe
+SV_city.lst:location:city:SV #El Salvador
+SX_city.lst:location:city:SX #Sint Maarten
+SY_city.lst:location:city:SY #Syrian Arab Republic
+SZ_city.lst:location:city:SZ #Swaziland
+TC_city.lst:location:city:TC #Turks and Caicos Islands
+TD_city.lst:location:city:TD #Chad
+TF_city.lst:location:city:TF #French Southern Territories
+TG_city.lst:location:city:TG #Togo
+TH_city.lst:location:city:TH #Thailand
+TJ_city.lst:location:city:TJ #Tajikistan
+TK_city.lst:location:city:TK #Tokelau
+TL_city.lst:location:city:TL #Timor-Leste
+TM_city.lst:location:city:TM #Turkmenistan
+TN_city.lst:location:city:TN #Tunisia
+TO_city.lst:location:city:TO #Tonga
+TR_city.lst:location:city:TR #Turkey
+TT_city.lst:location:city:TT #Trinidad and Tobago
+TV_city.lst:location:city:TV #Tuvalu
+TW_city.lst:location:city:TW #Taiwan
+TZ_city.lst:location:city:TZ #Tanzania, United Republic of
+UA_city.lst:location:city:UA #Ukraine
+UG_city.lst:location:city:UG #Uganda
+UM_city.lst:location:city:UM #United States Minor Outlying Islands
+US_city.lst:location:city:US #United States
+US_city.lst:location:city:US #United States of America
+UY_city.lst:location:city:UY #Uruguay
+UZ_city.lst:location:city:UZ #Uzbekistan
+VA_city.lst:location:city:VA #Holy See (Vatican City State)
+VC_city.lst:location:city:VC #Saint Vincent and the Grenadines
+VE_city.lst:location:city:VE #Venezuela
+VG_city.lst:location:city:VG #Virgin Islands, British
+VI_city.lst:location:city:VI #Virgin Islands, U.S.
+VN_city.lst:location:city:VN #Vietnam
+VU_city.lst:location:city:VU #Vanuatu
+WF_city.lst:location:city:WF #Wallis and Futuna
+WS_city.lst:location:city:WS #Samoa
+YE_city.lst:location:city:YE #Yemen
+YT_city.lst:location:city:YT #Mayotte
+ZA_city.lst:location:city:ZA #South Africa
+ZM_city.lst:location:city:ZM #Zambia
+ZW_city.lst:location:city:ZW #Zimbabwe

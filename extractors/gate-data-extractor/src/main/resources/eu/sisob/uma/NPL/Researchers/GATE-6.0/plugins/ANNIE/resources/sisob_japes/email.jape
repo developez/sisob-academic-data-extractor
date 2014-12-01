@@ -1,0 +1,83 @@
+﻿Phase: email
+Input: Token SpaceToken Lookup
+Options: control = appelt
+debug = true
+Macro: SPACE
+(
+	(
+	{SpaceToken.kind == space}
+	)*
+)
+
+Macro: EMAIL
+(
+	(
+	{Token.string == "email"} |
+	{Token.string == "Email"} |
+	{Token.string == "EMail"} |
+	{Token.string == "e-mail"} |
+	{Token.string == "E-mail"} |
+	{Token.string == "E-Mail"} |
+	{Token.string == "correo-e"} |
+	{Token.string == "e-correo"} 
+	)
+	({Token.kind == punctuation})?
+)
+
+Rule:MakeMail
+priority:20
+(
+	(
+	(EMAIL)
+	(SPACE)
+	)
+	(
+		(
+		{Token.kind == word}|{Token.kind == number}|{Token.string == "_"}
+		)+
+		({Token.string == "."}
+		({Token.kind== word}|{Token.kind == number}|{Token.string == "_"}
+		)
+		)?
+		({Token.string == "@"})
+		(
+		{Token.kind==word}|{Token.kind==symbol}| {Token.kind==punctuation}| {Token.kind == number}
+		)
+		({Token.string == "."})?
+		(
+		{Token.kind == word}|{Token.kind == symbol}|
+		{Token.kind == punctuation}|{Token.kind == number}
+		)?
+		({Token.string == "."})?
+		(
+		{Token.kind == word}| {Token.kind == symbol}|
+		{Token.kind == punctuation}| {Token.kind == number}
+		)?
+		({Token.string == "."})?
+		(
+		{Token.string == "."}
+		(
+		{Token.kind == word}| {Token.kind == number}
+		)
+		({Token.string == "."})?
+		(
+		{Token.kind == word}| {Token.kind == number}
+		)?
+		({Token.string == "."})?
+		(
+		{Token.kind == word}| {Token.kind == number}
+		)?
+		)
+	):varMail
+)
+-->
+:varMail.EmailResearcher = {rule="CreaMail", kind = EmailResearcher}
+
+
+Rule: TestAnnie
+priority: 20
+(
+	{Lookup.majorType == location}
+):varTest
+-->
+:varTest.varTest = {rule="TestAnnie"}

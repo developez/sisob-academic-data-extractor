@@ -1,0 +1,1999 @@
+﻿/*
+*  ProfessionalActivity.jape
+*
+*/
+
+Imports:
+{
+	import org.joda.time.DateTime;
+	import org.joda.time.Period;
+	import org.joda.time.PeriodType;
+}
+
+Phase:	ProfessionalActivity
+Input: Split Token Lookup Person Organization JobTitle Date Location
+Options: control = appelt debug = true
+
+Macro: PERSONTOWORKVERBPAST
+(
+	({Token.category == PRP} | {Person})	
+	(	
+		({Token.category == VBD, Token.root == join}) |
+		({Token.category == VBD, Token.root == work}) |                
+		({Token.category == VBD, Token.root == become}) |  
+		(
+			({Token.root == have, Token.category == VBZ})			
+			({Token.category == VBN, Token.root == work})
+		) |
+		(
+			({Token.root == have, Token.category == VBP})			
+			({Token.category == VBN})
+		) |
+		({Token.category == VBD, Token.root == receive})                
+	)
+)
+
+Macro: PERSONSTART
+(		
+    ({Token.category == PRP} | {Person})
+    (
+        ({Token.root == also})?
+		({Token.root == "start"} | {Token.root == "assume"})
+		({Token.category == "PRP$"})?
+		({Token.category == "DT"})?
+    )
+)
+
+Macro: PERSONMOVE
+(		
+    ({Token.category == PRP} | {Person})
+    (
+        ({Token.root == also})?
+		({Token.root == "move"} | {Token.root == "return"})
+		({Token.category == TO})
+		({Token.category == "PRP$"})?	
+    )
+)
+
+Macro: PERSONTOBEPAST
+(
+	({Token.category == PRP} | {Person})	
+	(	
+		(
+			{Token.category == VBD, Token.root == be}
+			(
+				
+				(
+				{Token.category == VBN, Token.root == elect} |
+				{Token.category == VBN, Token.root == appoint} |
+                {Token.category == VBD, Token.root == invite}
+				)
+			)?
+		)
+		| 		
+		(
+			{Token.category == VBZ, Token.root == have}
+			({Token.root == also})?			
+			{Token.category == VBN, Token.root == be}
+		)
+		|
+		(
+			{Token.category == VBD, Token.root == spend}						
+			{Token.category == CD}		
+			{Token.root == year}							
+		)
+		|
+		(
+			({Token.string == "additionally"})?
+			{Token.string == "held"}
+			{Token.string == "the"}
+			{Token.string == "position"}
+		)
+	)
+)
+
+Macro: PERSONTOBEPRESENT
+(		
+	({Token.category == PRP} | {Person})	
+	(	
+		(
+			({Token.category == VBZ, Token.root == be})					
+			({Token.root == also})?
+			({Token.string == "currently"})?
+		)		
+	)			
+)
+
+Macro: PERSONHAS
+(	
+		({Token.category == PRP} | {Person})
+		
+		(				
+			{Token.category == VBZ, Token.root == "have"}	
+		)					
+)
+
+Macro: PERSONTAKEUP
+(		
+    ({Token.category == PRP} | {Person})
+    (
+        ({Token.root == also})?
+		({Token.root == "take"})
+		({Token.string == "up"})		
+    )
+)
+
+
+Macro: PERSONWASBORN
+(	
+		({Token.category == PRP} | {Person})
+		
+		(
+			(	
+				{Token.category == VBD, Token.root == "be"}	
+				
+				{Token.category == VBN, Token.root == "bear"}					
+			)					
+			|
+			(	
+				{Token.string == "grew"}	
+				
+				{Token.string == "up"}					
+			)								
+		)
+)
+
+Macro: ENTITY_SEPARATOR_1
+(
+	({Token.string==","})?                                    
+	({Token.string=="/"})?
+	({Token.category== CC})?                                    
+	({Token.string=="then"})?
+	({Token.category == IN})?
+	({Token.category == DT})?
+	({Token.category == "PRP$"})?
+)
+
+Macro: ENTITY_SEPARATOR_2_1
+(
+	({Token.string==","})?
+	({Token.string == "("} | {Token.string == "/"} | {Token.string == "-"})?
+    /*({Token.category== CC, Token.string!="&"})?*/
+	({Token.string=="then"})?
+	({Token.category == IN})?
+	({Token.category == DT})?	
+	({Token.category == RB})?
+	({Token.category == VBN})?		
+	({Token.root=="hold"})?	
+	({Token.string=="current"})?	
+	({Token.string=="initially"})?		
+)
+
+Macro: VARJOB_ENTITY_SEPARATOR_BIS
+(
+	({Token.string=="status"})?
+	({Split.kind == external})?	
+)
+
+Macro: ENTITY_SEPARATOR_2_1_1
+(
+	({Token.string==","})?
+	({Token.string == "("} | {Token.string == "/"} | {Token.string == "-"})?    
+	({Token.string=="then"})?
+	({Token.category == IN})?
+	({Token.category == DT})?	
+	({Token.category == RB})?
+	({Token.category == VBN})?		
+	({Token.root=="hold"})?	
+	({Token.string=="current"})?	
+	({Token.string=="initially"})?	
+	({Token.category == "PRP$"})?
+)
+
+Macro: ENTITY_SEPARATOR_3_1
+(
+	({Token.string==","})?
+	({Token.string == "("} | {Token.string == "/"} | {Token.string == "-"})?    
+	({Token.category == IN})?
+	({Token.category == DT})?	
+	({Token.category == RB})?		
+	({Token.category == VBN})?
+)
+
+Macro: ENTITY_SEPARATOR_2_2
+(
+	({Token.root=="hold"})?		
+	({Token.string == ")"})?
+)		
+		
+
+Macro: COMMON_EXPRESSION_BEFOREJOB
+(
+	(
+		({Token.string == "to"} | {Token.string == "before"})?
+		{Token.root == "take"}
+		{Token.string == "up"}
+	)?
+	(
+		({Token.string == "to"})
+		{Token.root == "work"}		
+	)?
+	({Split.kind == external})?
+)
+
+Macro: COMMON_EXPRESSION_BEFOREORG
+(
+	(
+		{Token.string == "current"}		
+	)?
+)
+
+Macro: COMMON_EXPRESION_BEFOREDATE
+(
+	(
+		(
+			({Token.string==","})?
+			{Token.string == "having"}
+			{Token.string == "joined"}		
+		)		
+	)?
+)
+
+/* 
+TEST 
+
+He obtained his PhD in 2010 and his BA in department of Chemistry, University of Cardiff
+BA in department of Chemistry, University of Cardiff
+*/
+
+Rule: ProfessionalActivityPattern1
+Priority: 600
+(
+	(
+        (
+			(
+				({Token.string=="In"} | {Token.string=="From"})			
+				(({Date}):varDateCT)
+				({Token.string==","})						
+			)
+			|
+			(
+				(({Date}):varDateCT)
+				({Token.string=="-"})?			
+				({Token.string==":"})?						
+				({Split.kind == external})?
+			)
+			|
+			(
+				({Split.kind == external})				
+				(({Date}):varDateCT)
+				({Token.string=="."})
+			)
+		)? 		
+		(
+			((PERSONTOBEPRESENT) :varToBePresent) |
+			((PERSONTOBEPAST) : varToBePast) |
+			((PERSONTOWORKVERBPAST) :varVerbPast) |
+			((PERSONSTART) :varStart) |			
+			((PERSONTAKEUP) : varTakeUp)
+		) ?
+		(
+            ( 				
+				(ENTITY_SEPARATOR_1)				
+				({JobTitle}):varJob		
+				((VARJOB_ENTITY_SEPARATOR_BIS))		
+				((ENTITY_SEPARATOR_2_1))
+				(({Date}):varDateJob)?
+				(ENTITY_SEPARATOR_2_2)				
+			)[1,8]
+			(				
+				(
+					(ENTITY_SEPARATOR_2_1)
+					(({Organization.orgType == dept}):varOrgDept)
+					(ENTITY_SEPARATOR_2_2)
+				)?
+				(
+					(ENTITY_SEPARATOR_2_1)
+					(({Organization.orgType == school}):varOrgSchool)
+					(ENTITY_SEPARATOR_2_2)
+				)?
+				(
+					(ENTITY_SEPARATOR_2_1)
+					(({Organization.orgType != school,
+					   Organization.orgType != dept}):varOrg)
+					(ENTITY_SEPARATOR_2_2)
+				)?
+				(
+					(ENTITY_SEPARATOR_2_1)
+					(({Location.locType == city}):varLocCity)
+					(ENTITY_SEPARATOR_2_2)
+				)?
+				(
+					(ENTITY_SEPARATOR_2_1)
+					(({Location.locType == country}):varLocCountry)
+					(ENTITY_SEPARATOR_2_2)
+				)?
+				(
+					(ENTITY_SEPARATOR_2_1)
+					(({Location.locType != city,
+					   Location.locType != country}):varLocRegion)
+					(ENTITY_SEPARATOR_2_2)
+				)?
+				(
+					(COMMON_EXPRESION_BEFOREDATE)
+					(ENTITY_SEPARATOR_3_1)					
+					(({Date}):varDate)
+					(ENTITY_SEPARATOR_2_2)
+				)?
+			)
+		)
+	)
+):varResearcherExp
+-->
+{       
+    String sPrefix = "ProfessionalActivity";
+    String namePattern = "ProfessionalActivityPattern1";
+	//System.out.println(namePattern + " FOUND");
+	boolean noperson = true;
+	if((gate.AnnotationSet)bindings.get("varToBePresent") != null) noperson = false;
+	else if((gate.AnnotationSet)bindings.get("varToBePast") != null) noperson = false;
+	else if((gate.AnnotationSet)bindings.get("varVerbPast") != null)  noperson = false;
+	else if((gate.AnnotationSet)bindings.get("varStart") != null) noperson = false;
+	else if((gate.AnnotationSet)bindings.get("varTakeUp") != null) noperson = false;
+	//FIXME
+		
+	gate.AnnotationSet varDateCT = (gate.AnnotationSet)bindings.get("varDateCT");
+	
+	//gate.AnnotationSet varJob = (gate.AnnotationSet)bindings.get("varJob");	
+	//We need sort expression with many annotation	
+	List<gate.Annotation> varJob = null;
+	if((gate.AnnotationSet)bindings.get("varJob") != null)
+	{
+		varJob = new ArrayList((AnnotationSet)bindings.get("varJob"));       
+		Collections.sort(varJob, new OffsetComparator());
+	}   
+	
+	//gate.AnnotationSet varDateJob = (gate.AnnotationSet)bindings.get("varDateJob");
+	//We need sort expression with many annotation
+	List<gate.Annotation> varDateJob = null;
+	if((gate.AnnotationSet)bindings.get("varDateJob") != null)
+	{
+		varDateJob = new ArrayList((gate.AnnotationSet)bindings.get("varDateJob"));       
+		Collections.sort(varDateJob, new OffsetComparator());
+	}	
+	
+	gate.AnnotationSet varOrgDept = (gate.AnnotationSet)bindings.get("varOrgDept");
+	gate.AnnotationSet varOrgSchool = (gate.AnnotationSet)bindings.get("varOrgSchool");
+	gate.AnnotationSet varOrg = (gate.AnnotationSet)bindings.get("varOrg");
+	
+	gate.AnnotationSet varLocCity = (gate.AnnotationSet)bindings.get("varLocCity");
+	gate.AnnotationSet varLocCountry = (gate.AnnotationSet)bindings.get("varLocCountry");
+	gate.AnnotationSet varLocRegion = (gate.AnnotationSet)bindings.get("varLocRegion");
+	
+	gate.AnnotationSet varDate = (gate.AnnotationSet)bindings.get("varDate");
+
+	String nameAnn = "";
+	String nameAnnAux = "";
+	//gate.AnnotationSet annSetAux = null;
+	List<gate.Annotation> annSetAux = null;	
+	
+	gate.AnnotationSet varResearcherExpr = (gate.AnnotationSet)bindings.get("varResearcherExp");
+	
+	/* EXPERIMENTAL BLACK LIST MATCHER */
+	//gate.Utils.stringFor(doc, varResearcherExpr)
+	
+	if(
+		(
+		   (varDateCT  != null) || 
+		   (varDateJob != null) ||
+		   (varOrgDept != null) ||
+		   (varOrgSchool != null)	||
+		   (varOrg != null)	||
+		   (varLocCity != null)  ||
+		   (varLocCountry != null) ||
+		   (varLocRegion != null) ||
+		   (varDate != null) ||
+		   (noperson == false)
+	   ) 	   
+	  ) 
+	{
+		//System.out.println(namePattern + " FOUND " + gate.Utils.stringFor(doc, varResearcherExpr));
+		
+		try
+		{				
+			if(varDateJob == null) 
+			{
+				annSetAux = varJob;
+				nameAnn = "Title_name";
+				
+				if(annSetAux != null)
+				{				
+					for (gate.Annotation varAnnJob : annSetAux) 
+					{
+						String postfix = "NoCurrent";
+						
+						gate.FeatureMap features = Factory.newFeatureMap();
+						features.put("Pattern", namePattern);
+						features.put("Title_name", gate.Utils.stringFor(doc, varAnnJob));
+						
+						/* 
+						Modification when exist in AccreditedUniversityStudys only one Entity 
+						if(varOrgDept != null) features.put("EntityDep_entityName", gate.Utils.stringFor(doc, varOrgDept));
+						if(varOrgSchool != null) features.put("EntityFac_entityName", gate.Utils.stringFor(doc, varOrgSchool));
+						if(varOrg != null) features.put("Entity_entityName", gate.Utils.stringFor(doc, varOrg));
+						*/
+						
+						int indexEntity = 1;
+						if(varOrgDept != null)
+						{
+							features.put("Entity" + indexEntity + "_entityName", gate.Utils.stringFor(doc, varOrgDept));
+							features.put("Entity" + indexEntity + "_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_University_Department);							
+							indexEntity++;
+						}
+						
+						if(varOrgSchool != null) 
+						{							
+							features.put("Entity" + indexEntity + "_entityName", gate.Utils.stringFor(doc, varOrgSchool));
+							features.put("Entity" + indexEntity + "_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_University_Centers_And_Structures_And_Similar);							
+							indexEntity++;
+						}						
+						if(varOrg != null)
+						{
+							features.put("Entity" + indexEntity + "_entityName", gate.Utils.stringFor(doc, varOrg));
+							Object orgType = ((gate.Annotation)varOrg.iterator().next()).getFeatures().get("orgType");
+							if((orgType != null))
+							{								
+								if(orgType.equals("university"))
+								{							
+									features.put("Entity" + indexEntity + "_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_University);							
+								}
+								else
+								{
+									features.put("Entity" + indexEntity + "_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_Others);							
+								}
+							}
+							else
+							{
+								features.put("Entity" + indexEntity + "_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_Others);							
+							}							
+						}						
+						
+						if(varLocCity != null) features.put("PlaceJob_city", gate.Utils.stringFor(doc, varLocCity));
+						if(varLocCountry != null) features.put("PlaceJob_countryName", gate.Utils.stringFor(doc, varLocCountry));
+						if(varLocRegion != null) features.put("PlaceJob_regionName", gate.Utils.stringFor(doc, varLocRegion));
+						
+						gate.Annotation dateAnn = null;
+						
+						if(varDateCT != null)
+						{
+							dateAnn = (gate.Annotation)varDateCT.iterator().next();					
+						}
+						if(varDate != null)
+						{
+							dateAnn = (gate.Annotation)varDate.iterator().next();						
+						}
+						if(dateAnn != null)
+						{
+							Object year1 = dateAnn.getFeatures().get("year1");
+							if((year1 != null))
+								features.put("DateInit_year", year1.toString());
+								
+							Object month1 = dateAnn.getFeatures().get("month1");
+							if((month1 != null))
+								features.put("DateInit_monthYear", month1.toString());								
+							
+							Object year2 = dateAnn.getFeatures().get("year2");
+							if(year2 != null)
+							{	
+								if(year2.toString().equals("now")) 
+								{
+									postfix = "Current";
+								}
+								else
+								{
+									try
+									{
+										Object month2 = dateAnn.getFeatures().get("month2");
+									
+										DateTime start = new DateTime(Integer.parseInt(year1.toString()), month1 != null ? Integer.parseInt(month1.toString()) : 1, 1, 0, 0, 0, 0);
+										DateTime end = new DateTime(Integer.parseInt(year2.toString()), month2 != null ? Integer.parseInt(month2.toString()) : 1, 1, 0, 0, 0, 0);									
+										Period p = new Period(start, end, PeriodType.yearMonthDay());
+										
+										features.put("DateInit_duration", p.getDays() + "/" + p.getMonths() + "/" + p.getYears());	
+									}
+									catch(Exception ex)
+									{
+										System.out.println("Exception: " + ex.getMessage());
+									}
+								}
+								
+								/*							
+								Calendar dt1 = Calendar.getInstance();
+								dt1.set(Integer.parseInt(year1.toString()), 
+																		  (month1 != null ? Integer.parseInt(month1.toString()) : 1), 
+																			1);
+																			
+								Calendar dt2 = Calendar.getInstance();
+								dt2.set(Integer.parseInt(year2.toString()), 
+																			(month2 != null ? Integer.parseInt(month2.toString()) : 1), 
+																			1);											
+								
+								long difms = dt2.getTimeInMillis() - dt1.getTimeInMillis();
+								Long difd = difms / (1000 * 60 * 60 * 24);
+								difd = difd / 30;
+								features.put("DateInit_duration", difd.toString());								
+								*/
+							}															
+						}									
+						
+						try
+						{
+							outputAS.add(varResearcherExpr.firstNode(), varResearcherExpr.lastNode(), sPrefix + postfix, features);
+						}
+						catch(Exception ex)
+						{
+						}	
+					}	
+				}
+			}
+			else if(varDateJob != null) 
+			{
+				annSetAux = varJob;
+				nameAnn = "Title_name";
+				
+				if(annSetAux != null)
+				{
+					Iterator<Annotation> itJob = annSetAux.iterator();
+					Iterator<Annotation> itDateJob = varDateJob.iterator();
+					
+					while(itJob.hasNext())
+					{				
+						String postfix = "NoCurrent";
+						
+						Annotation varAnnJob = itJob.next();
+						
+						gate.FeatureMap features = Factory.newFeatureMap();
+						features.put("Pattern", namePattern);
+						features.put("Title_name", gate.Utils.stringFor(doc, varAnnJob));
+						
+						/* 
+						Modification when exist in AccreditedUniversityStudys only one Entity 
+						if(varOrgDept != null) features.put("EntityDep_entityName", gate.Utils.stringFor(doc, varOrgDept));
+						if(varOrgSchool != null) features.put("EntityFac_entityName", gate.Utils.stringFor(doc, varOrgSchool));
+						if(varOrg != null) features.put("Entity_entityName", gate.Utils.stringFor(doc, varOrg));
+						*/
+						
+						int indexEntity = 1;
+						if(varOrgDept != null)
+						{
+							features.put("Entity" + indexEntity + "_entityName", gate.Utils.stringFor(doc, varOrgDept));
+							features.put("Entity" + indexEntity + "_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_University_Department);							
+							indexEntity++;
+						}
+						
+						if(varOrgSchool != null) 
+						{							
+							features.put("Entity" + indexEntity + "_entityName", gate.Utils.stringFor(doc, varOrgSchool));
+							features.put("Entity" + indexEntity + "_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_University_Centers_And_Structures_And_Similar);							
+							indexEntity++;
+						}						
+						if(varOrg != null)
+						{
+							features.put("Entity" + indexEntity + "_entityName", gate.Utils.stringFor(doc, varOrg));
+							Object orgType = ((gate.Annotation)varOrg.iterator().next()).getFeatures().get("orgType");
+							if((orgType != null))
+							{								
+								if(orgType.equals("university"))
+								{							
+									features.put("Entity" + indexEntity + "_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_University);							
+								}
+								else
+								{
+									features.put("Entity" + indexEntity + "_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_Others);							
+								}
+							}
+							else
+							{
+								features.put("Entity" + indexEntity + "_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_Others);							
+							}							
+						}							
+						
+						if(varLocCity != null) features.put("PlaceJob_city", gate.Utils.stringFor(doc, varLocCity));
+						if(varLocCountry != null) features.put("PlaceJob_countryName", gate.Utils.stringFor(doc, varLocCountry));
+						if(varLocRegion != null) features.put("PlaceJob_regionName", gate.Utils.stringFor(doc, varLocRegion));
+										
+						gate.Annotation dateAnn = null;
+						if(itDateJob.hasNext())
+						{
+							dateAnn = (gate.Annotation)itDateJob.next();
+						}
+						//Some times, the last itDataJob isnt catched and pattern catchs varDate (Example: Lecturer in 1990, Fellowship in 1992, and Professor in 1993. (1990, 1992 => itDataJop, 1993 => varDate)
+						else if(!itJob.hasNext() && varDate != null)
+						{							
+							dateAnn = (gate.Annotation)varDate.iterator().next();										
+						}
+						if(dateAnn != null)
+						{
+							Object year1 = dateAnn.getFeatures().get("year1");
+							if((year1 != null))
+								features.put("DateInit_year", year1.toString());
+								
+							Object month1 = dateAnn.getFeatures().get("month1");
+							if((month1 != null))
+								features.put("DateInit_monthYear", month1.toString());
+							Object year2 = dateAnn.getFeatures().get("year2");
+							if(year2 != null)
+							{							
+								if(year2.toString().equals("now")) 
+								{
+									postfix = "Current";
+								}
+								else
+								{
+									try
+									{
+										Object month2 = dateAnn.getFeatures().get("month2");
+										
+										DateTime start = new DateTime(Integer.parseInt(year1.toString()), month1 != null ? Integer.parseInt(month1.toString()) : 1, 1, 0, 0, 0, 0);
+										DateTime end = new DateTime(Integer.parseInt(year2.toString()), month2 != null ? Integer.parseInt(month2.toString()) : 1, 1, 0, 0, 0, 0);								
+										Period p = new Period(start, end, PeriodType.yearMonthDay());									
+										
+										features.put("DateInit_duration", p.getDays() + "/" + p.getMonths() + "/" + p.getYears());										
+									}
+									catch(Exception ex)
+									{
+										System.out.println("Exception: " + ex.getMessage());
+									}
+								}
+								/*
+								Calendar dt1 = Calendar.getInstance();
+								dt1.set(Integer.parseInt(year1.toString()), 
+																		  (month1 != null ? Integer.parseInt(month1.toString()) : 1), 
+																			1);
+																			
+								Calendar dt2 = Calendar.getInstance();
+								dt2.set(Integer.parseInt(year2.toString()), 
+																			(month2 != null ? Integer.parseInt(month2.toString()) : 1), 
+																			1);											
+								
+								long difms = dt2.getTimeInMillis() - dt1.getTimeInMillis();
+								Long difd = difms / (1000 * 60 * 60 * 24);
+								difd = difd / 30;
+								features.put("DateInit_duration", difd.toString());								
+								*/
+							}
+						}						
+						
+						//features.put("DateTitle", gate.Utils.stringFor(doc, ));						
+						
+						try
+						{
+							outputAS.add(varResearcherExpr.firstNode(), varResearcherExpr.lastNode(), sPrefix + postfix, features);						
+						}
+						catch(Exception ex)
+						{
+						}	
+					}	
+				}	
+			}							
+		}
+		catch(Exception ex)
+		{
+		}
+	}
+}
+
+/* 
+TEST 
+
+He obtained in department of Chemistry, University of Cardiff his PhD.
+*/
+Rule: ProfessionalActivityPattern2
+Priority: 400
+(
+	(
+        (
+			(
+				({Token.string=="In"} | {Token.string=="From"})			
+				(({Date}):varDateCT)
+				({Token.string==","})						
+			)
+			|
+			(
+				(({Date}):varDateCT)
+				({Token.string=="-"})?			
+				({Token.string==":"})?						
+			)
+			|
+			(
+				({Split.kind == external})				
+				(({Date}):varDateCT)
+				({Token.string=="."})
+			)
+		)? 		
+		(
+			((PERSONTOBEPRESENT) :varToBePresent) |
+			((PERSONTOBEPAST) : varToBePast) |
+			((PERSONTOWORKVERBPAST) :varVerbPast) |
+			((PERSONSTART) :varStart)
+		) ?
+		(
+            ( 				
+				(ENTITY_SEPARATOR_1)
+				({JobTitle}):varJob				
+				(VARJOB_ENTITY_SEPARATOR_BIS)
+				(ENTITY_SEPARATOR_2_1)
+				(({Date}):varDateJob)?
+				(ENTITY_SEPARATOR_2_2)				
+			)[1,1]
+			(				
+				(
+					(
+						(ENTITY_SEPARATOR_1)
+						(({Organization}):varOrg)
+						(ENTITY_SEPARATOR_2_2)						
+					)
+					(
+						(ENTITY_SEPARATOR_2_1)
+						(({Date}):varDateOrg)?
+						(ENTITY_SEPARATOR_2_2)
+					)
+				)[2,8]
+				(
+					(ENTITY_SEPARATOR_2_1)
+					(({Location.locType == city}):varLocCity)
+					(ENTITY_SEPARATOR_2_2)
+				)?
+				(
+					(ENTITY_SEPARATOR_2_1)
+					(({Location.locType == country}):varLocCountry)
+					(ENTITY_SEPARATOR_2_2)
+				)?
+				(
+					(ENTITY_SEPARATOR_2_1)
+					(({Location.locType != city,
+					   Location.locType != country}):varLocRegion)
+					(ENTITY_SEPARATOR_2_2)
+				)?
+				(
+					(COMMON_EXPRESION_BEFOREDATE)
+					(ENTITY_SEPARATOR_3_1)					
+					(({Date}):varDate)
+					(ENTITY_SEPARATOR_2_2)
+				)?
+			)
+		)
+	)
+):varResearcherExp
+-->
+{  	
+    String sPrefix = "ProfessionalActivity";
+    String namePattern = "ProfessionalActivityPattern2";
+	//System.out.println(namePattern + " FOUND");
+	boolean noperson = true;
+	if((gate.AnnotationSet)bindings.get("varToBePresent") != null) noperson = false;
+	else if((gate.AnnotationSet)bindings.get("varToBePast") != null) noperson = false;
+	else if((gate.AnnotationSet)bindings.get("varVerbPast") != null)  noperson = false;
+	else if((gate.AnnotationSet)bindings.get("varStart") != null) noperson = false;
+	
+	//FIXME	
+	
+	gate.AnnotationSet varDateCT = (gate.AnnotationSet)bindings.get("varDateCT");
+	gate.AnnotationSet varJob = (gate.AnnotationSet)bindings.get("varJob");	
+	gate.AnnotationSet varDateJob = (gate.AnnotationSet)bindings.get("varDateJob");	
+	
+	
+	//gate.AnnotationSet varOrg = (gate.AnnotationSet)bindings.get("varOrg");	
+	//We need sort expression with many annotation
+	List<gate.Annotation> varOrg = null;
+	if((gate.AnnotationSet)bindings.get("varOrg") != null)
+	{
+		varOrg = new ArrayList((AnnotationSet)bindings.get("varOrg"));       
+		Collections.sort(varOrg, new OffsetComparator());
+	}  
+	
+	List<gate.Annotation> varDateOrg = null;
+	if((gate.AnnotationSet)bindings.get("varDateOrg") != null)
+	{
+		varDateOrg = new ArrayList((AnnotationSet)bindings.get("varDateOrg"));       
+		Collections.sort(varDateOrg, new OffsetComparator());
+	} 	
+	
+	gate.AnnotationSet varLocCity = (gate.AnnotationSet)bindings.get("varLocCity");
+	gate.AnnotationSet varLocCountry = (gate.AnnotationSet)bindings.get("varLocCountry");
+	gate.AnnotationSet varLocRegion = (gate.AnnotationSet)bindings.get("varLocRegion");
+	
+	gate.AnnotationSet varDate = (gate.AnnotationSet)bindings.get("varDate");
+
+	gate.AnnotationSet varResearcherExpr = (gate.AnnotationSet)bindings.get("varResearcherExp");
+	
+	
+
+	String nameAnn = "";
+	String nameAnnAux = "";
+	//gate.AnnotationSet annSetAux = null;
+	List<gate.Annotation> annSetAux = null;	
+	
+	if(
+		(
+		   (varDateCT  != null) || 
+		   (varDateJob != null) ||		  
+		   (varOrg != null)	||
+		   (varLocCity != null)  ||
+		   (varLocCountry != null) ||
+		   (varLocRegion != null) ||
+		   (varDate != null) ||
+		   (noperson == false)
+	   ) 	   
+	  ) 
+	{
+		//System.out.println(namePattern + " FOUND " + gate.Utils.stringFor(doc, varResearcherExpr));
+		try
+		{				
+			if(varDateOrg == null) 
+			{
+				annSetAux = varOrg;
+				nameAnn = "Title_name";
+				if(annSetAux != null)
+				{
+					for (gate.Annotation varAnnOrg : annSetAux) 
+					{
+						String postfix = "NoCurrent";
+						gate.FeatureMap features = Factory.newFeatureMap();
+						features.put("Pattern", namePattern);
+						if(varJob != null) features.put("Title_name", gate.Utils.stringFor(doc, varJob));					
+						
+						features.put("Entity1_entityName", gate.Utils.stringFor(doc, varAnnOrg));						
+						Object orgType = (varAnnOrg).getFeatures().get("orgType");
+						if((orgType != null))
+						{								
+							if(orgType.equals("dept"))
+							{							
+								features.put("Entity1_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_University_Department);							
+							}
+							else if(orgType.equals("school"))
+							{							
+								features.put("Entity1_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_University_Centers_And_Structures_And_Similar);							
+							}
+							else if(orgType.equals("university"))
+							{							
+								features.put("Entity1_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_University);							
+							}
+							else
+							{
+								features.put("Entity1_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_Others);							
+							}
+						}
+						else
+						{
+							features.put("Entity1_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_Others);							
+						}						
+						
+						if(varLocCity != null) features.put("PlaceJob_city", gate.Utils.stringFor(doc, varLocCity));
+						if(varLocCountry != null) features.put("PlaceJob_countryName", gate.Utils.stringFor(doc, varLocCountry));
+						if(varLocRegion != null) features.put("PlaceJob_regionName", gate.Utils.stringFor(doc, varLocRegion));
+						
+						gate.Annotation dateAnn = null;
+						
+						if(varDateCT != null)
+						{
+							dateAnn = (gate.Annotation)varDateCT.iterator().next();					
+						}
+						else if(varDateJob != null)
+						{
+							dateAnn = (gate.Annotation)varDateJob.iterator().next();						
+						}
+						else if(varDate != null)
+						{
+							dateAnn = (gate.Annotation)varDate.iterator().next();						
+						}
+						if(dateAnn != null)
+						{
+							Object year1 = dateAnn.getFeatures().get("year1");
+							if((year1 != null))							
+								features.put("DateInit_year", year1.toString());
+								
+							Object month1 = dateAnn.getFeatures().get("month1");
+							if((month1 != null))
+								features.put("DateInit_monthYear", month1.toString());
+								
+							Object year2 = dateAnn.getFeatures().get("year2");
+							if(year2 != null)
+							{
+								if(year2.toString().equals("now")) 
+								{
+									postfix = "Current";
+								}
+								else
+								{
+									try
+									{
+										Object month2 = dateAnn.getFeatures().get("month2");
+										
+										DateTime start = new DateTime(Integer.parseInt(year1.toString()), month1 != null ? Integer.parseInt(month1.toString()) : 1, 1, 0, 0, 0, 0);
+										DateTime end = new DateTime(Integer.parseInt(year2.toString()), month2 != null ? Integer.parseInt(month2.toString()) : 1, 1, 0, 0, 0, 0);								
+										Period p = new Period(start, end, PeriodType.yearMonthDay());
+										
+										features.put("DateInit_duration", p.getDays() + "/" + p.getMonths() + "/" + p.getYears());	
+									}
+									catch(Exception ex)
+									{
+										System.out.println("Exception: " + ex.getMessage());
+									}
+								}
+								/*																
+								Calendar dt1 = Calendar.getInstance();
+								dt1.set(Integer.parseInt(year1.toString()), 
+																		  (month1 != null ? Integer.parseInt(month1.toString()) : 1), 
+																			1);
+																			
+								Calendar dt2 = Calendar.getInstance();
+								dt2.set(Integer.parseInt(year2.toString()), 
+																			(month2 != null ? Integer.parseInt(month2.toString()) : 1), 
+																			1);											
+								
+								long difms = dt2.getTimeInMillis() - dt1.getTimeInMillis();
+								Long difd = difms / (1000 * 60 * 60 * 24);
+								difd = difd / 30;
+								features.put("DateInit_duration", difd.toString());								
+								*/
+							}							
+						}									
+						
+						try
+						{
+							outputAS.add(varResearcherExpr.firstNode(), varResearcherExpr.lastNode(), sPrefix + postfix, features);
+						}
+						catch(Exception ex)
+						{
+						}	
+					}	
+				}
+			}
+			else if(varDateOrg != null) 
+			{				
+				annSetAux = varOrg;
+				nameAnn = "Title_name";
+				if(annSetAux != null)
+				{
+					Iterator<Annotation> itOrg = annSetAux.iterator();
+					Iterator<Annotation> itDateOrg = varDateOrg.iterator();
+					
+					while(itOrg.hasNext())
+					{				
+						String postfix = "NoCurrent";
+						gate.FeatureMap features = Factory.newFeatureMap();
+						features.put("Pattern", namePattern);
+						if(varJob != null) features.put("Title_name", gate.Utils.stringFor(doc, varJob));
+						
+						Annotation varAnnOrg = itOrg.next();
+						
+						features.put("Entity1_entityName", gate.Utils.stringFor(doc, varAnnOrg));			
+						Object orgType = varAnnOrg.getFeatures().get("orgType");
+						if((orgType != null))
+						{								
+							if(orgType.equals("dept"))
+							{							
+								features.put("Entity1_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_University_Department);							
+							}
+							else if(orgType.equals("school"))
+							{							
+								features.put("Entity1_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_University_Centers_And_Structures_And_Similar);							
+							}
+							else if(orgType.equals("university"))
+							{							
+								features.put("Entity1_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_University);							
+							}
+							else
+							{
+								features.put("Entity1_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_Others);							
+							}
+						}
+						else
+						{
+							features.put("Entity1_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_Others);							
+						}								
+						
+						if(varLocCity != null) features.put("PlaceJob_city", gate.Utils.stringFor(doc, varLocCity));
+						if(varLocCountry != null) features.put("PlaceJob_countryName", gate.Utils.stringFor(doc, varLocCountry));
+						if(varLocRegion != null) features.put("PlaceJob_regionName", gate.Utils.stringFor(doc, varLocRegion));
+
+						gate.Annotation dateAnn = null;
+						if(itDateOrg.hasNext())
+						{
+							dateAnn = (gate.Annotation)itDateOrg.next();
+						}						
+						//Some times, the last itDataOrg isnt catched and pattern catchs varDate (Example: Lecturer in Chemistry on UDC in 1990, Oxford University in 1992, and Cardiff University in 1993. (1990, 1992 => itDataJop, 1993 => varDate)
+						else if(!itOrg.hasNext() && varDate != null)
+						{							
+							dateAnn = (gate.Annotation)varDate.iterator().next();										
+						}
+						
+						if(dateAnn != null)
+						{
+							Object year1 = dateAnn.getFeatures().get("year1");
+							if((year1 != null))
+								features.put("DateInit_year", year1.toString());
+								
+							Object month1 = dateAnn.getFeatures().get("month1");
+							if((month1 != null))
+								features.put("DateInit_monthYear", month1.toString());
+								
+							Object year2 = dateAnn.getFeatures().get("year2");								
+							if(year2 != null)
+							{
+								if(year2.toString().equals("now")) 
+								{
+									postfix = "Current";
+								}
+								else
+								{
+									try
+									{
+										Object month2 = dateAnn.getFeatures().get("month2");
+										
+										DateTime start = new DateTime(Integer.parseInt(year1.toString()), month1 != null ? Integer.parseInt(month1.toString()) : 1, 1, 0, 0, 0, 0);
+										DateTime end = new DateTime(Integer.parseInt(year2.toString()), month2 != null ? Integer.parseInt(month2.toString()) : 1, 1, 0, 0, 0, 0);								
+										Period p = new Period(start, end, PeriodType.yearMonthDay());
+									
+										features.put("DateInit_duration", p.getDays() + "/" + p.getMonths() + "/" + p.getYears());	
+									}
+									catch(Exception ex)
+									{
+										System.out.println("Exception: " + ex.getMessage());
+									}
+								}
+								/*
+								Calendar dt1 = Calendar.getInstance();
+								dt1.set(Integer.parseInt(year1.toString()), 
+																		  (month1 != null ? Integer.parseInt(month1.toString()) : 1), 
+																			1);
+																			
+								Calendar dt2 = Calendar.getInstance();
+								dt2.set(Integer.parseInt(year2.toString()), 
+																			(month2 != null ? Integer.parseInt(month2.toString()) : 1), 
+																			1);											
+								
+								long difms = dt2.getTimeInMillis() - dt1.getTimeInMillis();
+								Long difd = difms / (1000 * 60 * 60 * 24);
+								difd = difd / 30;
+								features.put("DateInit_duration", difd.toString());								
+								*/
+							}							
+						}						
+						
+						//features.put("DateTitle", gate.Utils.stringFor(doc, ));						
+						
+						try
+						{
+							outputAS.add(varResearcherExpr.firstNode(), varResearcherExpr.lastNode(), sPrefix + postfix, features);						
+						}
+						catch(Exception ex)
+						{
+						}	
+					}	
+				}	
+			}							
+		}
+		catch(Exception ex)
+		{
+		}
+	}
+}
+
+
+/* EXAMPLES
+In September 2005 he moved to the School of Chemistry, University of Birmingham, as a lecturer in Chemistry.
+
+He returned to the University of Birmingham in 1999 to take up a lectureship in materials chemistry.
+*/
+Rule: ProfessionalActivityPattern3
+Priority: 500
+(
+	(
+        (
+			(
+				({Token.string=="In"} | {Token.string=="From"})			
+				(({Date}):varDateCT)
+				({Token.string==","})						
+			)
+			|
+			(
+				(({Date}):varDateCT)
+				({Token.string=="-"})?			
+				({Token.string==":"})?							
+			)
+			|
+			(
+				({Split.kind == external})				
+				(({Date}):varDateCT)
+				({Token.string=="."})
+			)
+		)?		
+		(
+			((PERSONTOBEPRESENT) :varToBePresent) |
+			((PERSONTOBEPAST) : varToBePast) |
+			((PERSONTOWORKVERBPAST) :varVerbPast) |
+			((PERSONSTART) :varStart) |
+			((PERSONMOVE): varMove)
+		) ?
+		(
+            ( 	
+				(
+					(								
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType == dept}):varOrgDept)
+							(ENTITY_SEPARATOR_2_2)
+						)?
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType == school}):varOrgSchool)
+							(ENTITY_SEPARATOR_2_2)
+						)?
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType != school,
+							   Organization.orgType != dept}):varOrg)
+							(ENTITY_SEPARATOR_2_2)
+						)
+					)
+					|
+					(								
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType != school,
+							   Organization.orgType != dept}):varOrg)
+							(ENTITY_SEPARATOR_2_2)
+						)
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType == school}):varOrgSchool)
+							(ENTITY_SEPARATOR_2_2)
+						)?
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType == dept}):varOrgDept)
+							(ENTITY_SEPARATOR_2_2)
+						)?
+					)
+					|					
+					(
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType == dept}):varOrgDept)
+							(ENTITY_SEPARATOR_2_2)
+						)?
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType == school}):varOrgSchool)
+							(ENTITY_SEPARATOR_2_2)
+						)
+					)
+					|
+					(
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType == dept}):varOrgDept)
+							(ENTITY_SEPARATOR_2_2)
+						)
+					)
+				)											
+			)[1,1]
+			(		
+				(
+					(ENTITY_SEPARATOR_2_1)
+					(({Location.locType == city}):varLocCity)
+					(ENTITY_SEPARATOR_2_2)
+				)?	
+				(
+					(ENTITY_SEPARATOR_2_1)
+					(({Location.locType == country}):varLocCountry)
+					(ENTITY_SEPARATOR_2_2)
+				)?							
+				(
+					(ENTITY_SEPARATOR_2_1)
+					(({Location.locType != city,
+					   Location.locType != country}):varLocRegion)
+					(ENTITY_SEPARATOR_2_2)
+				)?				
+				(ENTITY_SEPARATOR_2_1)
+				(({Date}):varDateOrg)?
+				(ENTITY_SEPARATOR_2_2)
+				(
+					(
+						(COMMON_EXPRESSION_BEFOREJOB)
+						(ENTITY_SEPARATOR_2_1)						
+						(({JobTitle}):varJob)
+						(ENTITY_SEPARATOR_2_2)
+					)
+				)[1,1]				
+				(
+					(COMMON_EXPRESION_BEFOREDATE)
+					(ENTITY_SEPARATOR_3_1)					
+					(({Date}):varDate)
+					(ENTITY_SEPARATOR_2_2)
+				)?
+			)
+		)
+	)
+):varResearcherExp
+-->
+{
+	String sPrefix = "ProfessionalActivity";
+    String namePattern = "ProfessionalActivityPattern3";	
+	//System.out.println(namePattern + " FOUND");
+	boolean noperson = true;
+	if((gate.AnnotationSet)bindings.get("varToBePresent") != null) noperson = false;
+	else if((gate.AnnotationSet)bindings.get("varToBePast") != null) noperson = false;
+	else if((gate.AnnotationSet)bindings.get("varVerbPast") != null)  noperson = false;
+	else if((gate.AnnotationSet)bindings.get("varStart") != null) noperson = false;
+	
+	//FIXME	
+	
+	gate.AnnotationSet varDateCT = (gate.AnnotationSet)bindings.get("varDateCT");	
+	
+	gate.AnnotationSet varOrgDept = (gate.AnnotationSet)bindings.get("varOrgDept");
+	gate.AnnotationSet varOrgSchool = (gate.AnnotationSet)bindings.get("varOrgSchool");
+	gate.AnnotationSet varOrg = (gate.AnnotationSet)bindings.get("varOrg");
+	
+	gate.AnnotationSet varDateOrg = (gate.AnnotationSet)bindings.get("varDateOrg");	
+	
+	gate.AnnotationSet varLocCity = (gate.AnnotationSet)bindings.get("varLocCity");
+	gate.AnnotationSet varLocCountry = (gate.AnnotationSet)bindings.get("varLocCountry");
+	gate.AnnotationSet varLocRegion = (gate.AnnotationSet)bindings.get("varLocRegion");
+	
+	gate.AnnotationSet varJob = (gate.AnnotationSet)bindings.get("varJob");	
+	
+	gate.AnnotationSet varDate = (gate.AnnotationSet)bindings.get("varDate");
+
+	gate.AnnotationSet varResearcherExpr = (gate.AnnotationSet)bindings.get("varResearcherExp");
+	
+	//System.out.println(namePattern + " FOUND " + gate.Utils.stringFor(doc, varResearcherExpr));
+
+	String nameAnn = "";
+	String nameAnnAux = "";
+	//gate.AnnotationSet annSetAux = null;
+	List<gate.Annotation> annSetAux = null;		
+	
+	{
+		try
+		{	
+			String postfix = "NoCurrent";
+			
+			gate.FeatureMap features = Factory.newFeatureMap();
+			features.put("Pattern", namePattern);			
+			
+			/* 
+			Modification when exist in AccreditedUniversityStudys only one Entity 
+			if(varOrgDept != null) features.put("EntityDep_entityName", gate.Utils.stringFor(doc, varOrgDept));
+			if(varOrgSchool != null) features.put("EntityFac_entityName", gate.Utils.stringFor(doc, varOrgSchool));
+			if(varOrg != null) features.put("Entity_entityName", gate.Utils.stringFor(doc, varOrg));
+			*/
+			
+			int indexEntity = 1;
+			if(varOrgDept != null)
+			{
+				features.put("Entity" + indexEntity + "_entityName", gate.Utils.stringFor(doc, varOrgDept));
+				features.put("Entity" + indexEntity + "_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_University_Department);							
+				indexEntity++;
+			}
+			
+			if(varOrgSchool != null) 
+			{							
+				features.put("Entity" + indexEntity + "_entityName", gate.Utils.stringFor(doc, varOrgSchool));
+				features.put("Entity" + indexEntity + "_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_University_Centers_And_Structures_And_Similar);							
+				indexEntity++;
+			}						
+			if(varOrg != null)
+			{
+				features.put("Entity" + indexEntity + "_entityName", gate.Utils.stringFor(doc, varOrg));
+				Object orgType = ((gate.Annotation)varOrg.iterator().next()).getFeatures().get("orgType");
+				if((orgType != null))
+				{								
+					if(orgType.equals("university"))
+					{							
+						features.put("Entity" + indexEntity + "_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_University);							
+					}
+					else
+					{
+						features.put("Entity" + indexEntity + "_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_Others);							
+					}
+				}
+				else
+				{
+					features.put("Entity" + indexEntity + "_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_Others);							
+				}							
+			}				
+			
+			if(varLocCity != null) features.put("PlaceJob_city", gate.Utils.stringFor(doc, varLocCity));
+			if(varLocCountry != null) features.put("PlaceJob_countryName", gate.Utils.stringFor(doc, varLocCountry));
+			if(varLocRegion != null) features.put("PlaceJob_regionName", gate.Utils.stringFor(doc, varLocRegion));
+			
+			features.put("Title_name", gate.Utils.stringFor(doc, varJob));		
+			
+			gate.Annotation dateAnn = null;						
+			
+			if(varDateOrg != null)
+			{				
+				dateAnn = (gate.Annotation)varDateOrg.iterator().next();					
+			} 
+			else if(varDateCT != null)
+			{			
+				dateAnn = (gate.Annotation)varDateCT.iterator().next();						
+			}			
+			else if(varDate != null)
+			{
+				dateAnn = (gate.Annotation)varDate.iterator().next();						
+			}
+			
+			if(dateAnn != null)
+			{
+				Object year1 = dateAnn.getFeatures().get("year1");
+				if((year1 != null))
+					features.put("DateInit_year", year1.toString());
+					
+				Object month1 = dateAnn.getFeatures().get("month1");
+				if((month1 != null))
+					features.put("DateInit_monthYear", month1.toString());								
+				
+				Object year2 = dateAnn.getFeatures().get("year2");
+				if(year2 != null)
+				{	
+					if(year2.toString().equals("now")) 
+					{
+						postfix = "Current";
+					}
+					else
+					{
+						try
+						{
+							Object month2 = dateAnn.getFeatures().get("month2");
+						
+							DateTime start = new DateTime(Integer.parseInt(year1.toString()), month1 != null ? Integer.parseInt(month1.toString()) : 1, 1, 0, 0, 0, 0);
+							DateTime end = new DateTime(Integer.parseInt(year2.toString()), month2 != null ? Integer.parseInt(month2.toString()) : 1, 1, 0, 0, 0, 0);									
+							Period p = new Period(start, end, PeriodType.yearMonthDay());
+							
+							features.put("DateInit_duration", p.getDays() + "/" + p.getMonths() + "/" + p.getYears());	
+						}
+						catch(Exception ex)
+						{
+							System.out.println("Exception: " + ex.getMessage());
+						}
+					}
+				}	
+			}	
+			try
+			{
+				outputAS.add(varResearcherExpr.firstNode(), varResearcherExpr.lastNode(), sPrefix + postfix, features);
+			}
+			catch(Exception ex)
+			{
+			}				
+		}
+		catch(Exception ex)
+		{
+		}
+	}
+}
+
+
+
+
+Rule: ProfessionalActivityPattern5
+Priority: 500
+(
+	(
+        (
+			(
+				({Token.string=="In"} | {Token.string=="From"})			
+				(({Date}):varDateCT)
+				({Token.string==","})						
+			)
+			|
+			(
+				(({Date}):varDateCT)
+				({Token.string=="-"})?			
+				({Token.string==":"})?							
+			)
+			|
+			(
+				({Split.kind == external})				
+				(({Date}):varDateCT)
+				({Token.string=="."})
+			)
+		)? 		
+		(			
+			((PERSONMOVE): varMove)
+		) 
+		(            
+			(		
+				(
+					(ENTITY_SEPARATOR_2_1)
+					(({Location.locType == city}):varLocCity)
+					(ENTITY_SEPARATOR_2_2)
+				)?	
+				(
+					(ENTITY_SEPARATOR_2_1)
+					(({Location.locType == country}):varLocCountry)
+					(ENTITY_SEPARATOR_2_2)
+				)?							
+				(
+					(ENTITY_SEPARATOR_2_1)
+					(({Location.locType != city,
+					   Location.locType != country}):varLocRegion)
+					(ENTITY_SEPARATOR_2_2)
+				)?		
+				(ENTITY_SEPARATOR_2_1)
+				(({Date}):varDateLoc)?
+				(ENTITY_SEPARATOR_2_2)		
+			)
+			(	
+				(
+					(
+						(COMMON_EXPRESSION_BEFOREJOB)
+						(ENTITY_SEPARATOR_2_1)						
+						(({JobTitle}):varJob)
+						(ENTITY_SEPARATOR_2_2)
+					)
+				)[1,1]	
+				(
+					(								
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType == dept}):varOrgDept)
+							(ENTITY_SEPARATOR_2_2)
+						)?
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType == school}):varOrgSchool)
+							(ENTITY_SEPARATOR_2_2)
+						)?
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType != school,
+							   Organization.orgType != dept}):varOrg)
+							(ENTITY_SEPARATOR_2_2)
+						)
+					)
+					|
+					(								
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType != school,
+							   Organization.orgType != dept}):varOrg)
+							(ENTITY_SEPARATOR_2_2)
+						)
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType == school}):varOrgSchool)
+							(ENTITY_SEPARATOR_2_2)
+						)?
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType == dept}):varOrgDept)
+							(ENTITY_SEPARATOR_2_2)
+						)?
+					)
+					|					
+					(
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType == dept}):varOrgDept)
+							(ENTITY_SEPARATOR_2_2)
+						)?
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType == school}):varOrgSchool)
+							(ENTITY_SEPARATOR_2_2)
+						)
+					)
+					|
+					(
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType == dept}):varOrgDept)
+							(ENTITY_SEPARATOR_2_2)
+						)
+					)
+				)?				
+				(
+					(COMMON_EXPRESION_BEFOREDATE)
+					(ENTITY_SEPARATOR_3_1)					
+					(({Date}):varDate)
+					(ENTITY_SEPARATOR_2_2)
+				)?
+			)
+		)
+	)
+):varResearcherExp
+-->
+{
+
+	String sPrefix = "ProfessionalActivity";
+    String namePattern = "ProfessionalActivityPattern5";
+	//System.out.println(namePattern + " FOUND");
+	boolean noperson = true;	
+	
+	gate.AnnotationSet varDateCT = (gate.AnnotationSet)bindings.get("varDateCT");	
+	
+	gate.AnnotationSet varLocCity = (gate.AnnotationSet)bindings.get("varLocCity");
+	gate.AnnotationSet varLocCountry = (gate.AnnotationSet)bindings.get("varLocCountry");
+	gate.AnnotationSet varLocRegion = (gate.AnnotationSet)bindings.get("varLocRegion");
+	
+	gate.AnnotationSet varDateLoc = (gate.AnnotationSet)bindings.get("varDateLoc");	
+	
+	gate.AnnotationSet varJob = (gate.AnnotationSet)bindings.get("varJob");	
+	
+	gate.AnnotationSet varOrgDept = (gate.AnnotationSet)bindings.get("varOrgDept");
+	gate.AnnotationSet varOrgSchool = (gate.AnnotationSet)bindings.get("varOrgSchool");
+	gate.AnnotationSet varOrg = (gate.AnnotationSet)bindings.get("varOrg");	
+	
+	gate.AnnotationSet varDate = (gate.AnnotationSet)bindings.get("varDate");
+
+	gate.AnnotationSet varResearcherExpr = (gate.AnnotationSet)bindings.get("varResearcherExp");
+	
+	//System.out.println(namePattern + " FOUND " + gate.Utils.stringFor(doc, varResearcherExpr));
+
+	String nameAnn = "";
+	String nameAnnAux = "";
+	//gate.AnnotationSet annSetAux = null;
+	List<gate.Annotation> annSetAux = null;		
+	
+	{
+		try
+		{	
+			String postfix = "NoCurrent";
+			
+			gate.FeatureMap features = Factory.newFeatureMap();
+			features.put("Pattern", namePattern);
+			
+			/* 
+			Modification when exist in AccreditedUniversityStudys only one Entity 
+			if(varOrgDept != null) features.put("EntityDep_entityName", gate.Utils.stringFor(doc, varOrgDept));
+			if(varOrgSchool != null) features.put("EntityFac_entityName", gate.Utils.stringFor(doc, varOrgSchool));
+			if(varOrg != null) features.put("Entity_entityName", gate.Utils.stringFor(doc, varOrg));
+			*/
+			
+			int indexEntity = 1;
+			if(varOrgDept != null)
+			{
+				features.put("Entity" + indexEntity + "_entityName", gate.Utils.stringFor(doc, varOrgDept));
+				features.put("Entity" + indexEntity + "_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_University_Department);							
+				indexEntity++;
+			}
+			
+			if(varOrgSchool != null) 
+			{							
+				features.put("Entity" + indexEntity + "_entityName", gate.Utils.stringFor(doc, varOrgSchool));
+				features.put("Entity" + indexEntity + "_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_University_Centers_And_Structures_And_Similar);							
+				indexEntity++;
+			}						
+			if(varOrg != null)
+			{
+				features.put("Entity" + indexEntity + "_entityName", gate.Utils.stringFor(doc, varOrg));
+				Object orgType = ((gate.Annotation)varOrg.iterator().next()).getFeatures().get("orgType");
+				if((orgType != null))
+				{								
+					if(orgType.equals("university"))
+					{							
+						features.put("Entity" + indexEntity + "_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_University);							
+					}
+					else
+					{
+						features.put("Entity" + indexEntity + "_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_Others);							
+					}
+				}
+				else
+				{
+					features.put("Entity" + indexEntity + "_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_Others);							
+				}							
+			}			
+			
+			if(varLocCity != null) features.put("PlaceJob_city", gate.Utils.stringFor(doc, varLocCity));
+			if(varLocCountry != null) features.put("PlaceJob_countryName", gate.Utils.stringFor(doc, varLocCountry));
+			if(varLocRegion != null) features.put("PlaceJob_regionName", gate.Utils.stringFor(doc, varLocRegion));
+			
+			features.put("Title_name", gate.Utils.stringFor(doc, varJob));		
+			
+			gate.Annotation dateAnn = null;						
+			
+			if(varDateLoc != null)
+			{				
+				dateAnn = (gate.Annotation)varDateLoc.iterator().next();					
+			} 
+			else if(varDateCT != null)
+			{			
+				dateAnn = (gate.Annotation)varDateCT.iterator().next();						
+			}			
+			else if(varDate != null)
+			{			
+				dateAnn = (gate.Annotation)varDate.iterator().next();						
+			}
+			
+			if(dateAnn != null)
+			{
+				Object year1 = dateAnn.getFeatures().get("year1");
+				if((year1 != null))
+					features.put("DateInit_year", year1.toString());
+					
+				Object month1 = dateAnn.getFeatures().get("month1");
+				if((month1 != null))
+					features.put("DateInit_monthYear", month1.toString());								
+				
+				Object year2 = dateAnn.getFeatures().get("year2");
+				if(year2 != null)
+				{	
+					if(year2.toString().equals("now")) 
+					{
+						postfix = "Current";
+					}
+					else
+					{
+						try
+						{
+							Object month2 = dateAnn.getFeatures().get("month2");
+						
+							DateTime start = new DateTime(Integer.parseInt(year1.toString()), month1 != null ? Integer.parseInt(month1.toString()) : 1, 1, 0, 0, 0, 0);
+							DateTime end = new DateTime(Integer.parseInt(year2.toString()), month2 != null ? Integer.parseInt(month2.toString()) : 1, 1, 0, 0, 0, 0);									
+							Period p = new Period(start, end, PeriodType.yearMonthDay());
+							
+							features.put("DateInit_duration", p.getDays() + "/" + p.getMonths() + "/" + p.getYears());	
+						}
+						catch(Exception ex)
+						{
+							System.out.println("Exception: " + ex.getMessage());
+						}
+					}
+				}	
+			}	
+			try
+			{
+				outputAS.add(varResearcherExpr.firstNode(), varResearcherExpr.lastNode(), sPrefix + postfix, features);
+			}
+			catch(Exception ex)
+			{
+			}				
+		}
+		catch(Exception ex)
+		{
+		}
+	}
+}
+/*
+Rule: ProfessionalActivityPattern6
+Priority: 100
+//({Split.kind == external})
+(
+	(({JobTitle}):varJob)
+	({Person})
+	({Split.kind == external})[1,5]
+	(
+		(
+			(ENTITY_SEPARATOR_2_1)
+			(({Organization.orgType == dept}):varOrgDept)
+			(ENTITY_SEPARATOR_2_2)
+		) |
+		(
+			(ENTITY_SEPARATOR_2_1)
+			(({Organization.orgType == school}):varOrgSchool)
+			(ENTITY_SEPARATOR_2_2)
+		) |
+		(
+			(ENTITY_SEPARATOR_2_1)
+			(({Organization.orgType != school,
+			   Organization.orgType != dept}):varOrg)
+			(ENTITY_SEPARATOR_2_2)
+		)
+	)?
+):varResearcherExp
+-->
+{	
+	String sPrefix = "ProfessionalActivity";
+    String namePattern = "ProfessionalActivityPattern6";
+	//System.out.println(namePattern + " FOUND");
+	
+	gate.AnnotationSet varJob = (gate.AnnotationSet)bindings.get("varJob");		
+	
+	gate.AnnotationSet varOrgDept = (gate.AnnotationSet)bindings.get("varOrgDept");
+	gate.AnnotationSet varOrgSchool = (gate.AnnotationSet)bindings.get("varOrgSchool");
+	gate.AnnotationSet varOrg = (gate.AnnotationSet)bindings.get("varOrg");	
+	
+	gate.AnnotationSet varResearcherExpr = (gate.AnnotationSet)bindings.get("varResearcherExp");
+	
+	try
+	{
+		String postfix = "Current";			
+		gate.FeatureMap features = Factory.newFeatureMap();
+		features.put("Pattern", namePattern);		
+		
+		if(varOrgDept != null) features.put("EntityDep_entityName", gate.Utils.stringFor(doc, varOrgDept));
+		if(varOrgSchool != null) features.put("EntityFac_entityName", gate.Utils.stringFor(doc, varOrgSchool));
+		if(varOrg != null) features.put("Entity_entityName", gate.Utils.stringFor(doc, varOrg));
+		
+		features.put("Title_name", gate.Utils.stringFor(doc, varJob));	
+		
+		outputAS.add(varResearcherExpr.firstNode(), varResearcherExpr.lastNode(), sPrefix + postfix, features);		
+	}
+	catch(Exception ex)
+	{
+		System.out.println("EXCEPTION ProfessionalActivityPattern6 FOUND");
+	}
+}
+*/
+
+Rule: ProfessionalActivityPattern7
+Priority: 200
+//({Split.kind == external})
+(
+	(
+		(({Token.string == "Dr"}) | ({JobTitle}))
+		(({Person}):varPerson)
+		({Split.kind == external})[1,5]
+	)?
+	({Token.string == "Position"})?
+	({Token.string=="-"})?			
+	({Token.string==":"})?
+	(			
+		(({JobTitle}):varJob)	
+		({Split.kind == external})
+	)+	
+	({Split.kind == external})[0,5]
+	({Token.string == "Address"})?
+	({Token.string=="-"})?			
+	({Token.string==":"})?
+	({Split.kind == external})[0,2]
+	(
+		(				
+			(({Organization.orgType == dept}):varOrgDept)	
+			({Split.kind == external})[0,2]			
+		)?
+		(			
+			(({Organization.orgType == school}):varOrgSchool)
+			({Split.kind == external})[0,2]			
+		)?
+		(		
+			(({Organization.orgType != school,
+			   Organization.orgType != dept}):varOrg)		
+			({Split.kind == external})[0,2]			
+		)?
+	)
+):varResearcherExp
+-->
+{	
+	String sPrefix = "ProfessionalActivity";
+    String namePattern = "ProfessionalActivityPattern7";
+	String postfix = "Current";		
+	
+	
+	//gate.AnnotationSet varJob = (gate.AnnotationSet)bindings.get("varJob");	
+	//We need sort expression with many annotation	
+	List<gate.Annotation> varJob = null;
+	if((gate.AnnotationSet)bindings.get("varJob") != null)
+	{
+		varJob = new ArrayList((AnnotationSet)bindings.get("varJob"));       
+		Collections.sort(varJob, new OffsetComparator());
+	}   
+	
+	gate.AnnotationSet varOrgDept = (gate.AnnotationSet)bindings.get("varOrgDept");
+	gate.AnnotationSet varOrgSchool = (gate.AnnotationSet)bindings.get("varOrgSchool");
+	gate.AnnotationSet varOrg = (gate.AnnotationSet)bindings.get("varOrg");	
+	gate.AnnotationSet varPerson = (gate.AnnotationSet)bindings.get("varPerson");	
+	
+	gate.AnnotationSet varResearcherExpr = (gate.AnnotationSet)bindings.get("varResearcherExp");
+	
+	
+	if( (varOrgDept != null) ||
+		(varOrgSchool != null)	||
+		(varOrg != null) ||
+		(varPerson != null)
+	  )
+	  {	
+		//System.out.println(namePattern + " FOUND " + gate.Utils.stringFor(doc, varResearcherExpr));
+		try
+		{	
+			for (gate.Annotation varAnnJob : varJob) 
+			{
+				gate.FeatureMap features = Factory.newFeatureMap();	
+				features.put("Pattern", namePattern);		
+			
+				/* 
+				Modification when exist in AccreditedUniversityStudys only one Entity 
+				if(varOrgDept != null) features.put("EntityDep_entityName", gate.Utils.stringFor(doc, varOrgDept));
+				if(varOrgSchool != null) features.put("EntityFac_entityName", gate.Utils.stringFor(doc, varOrgSchool));
+				if(varOrg != null) features.put("Entity_entityName", gate.Utils.stringFor(doc, varOrg));
+				*/
+				
+				int indexEntity = 1;
+				if(varOrgDept != null)
+				{
+					features.put("Entity" + indexEntity + "_entityName", gate.Utils.stringFor(doc, varOrgDept));
+					features.put("Entity" + indexEntity + "_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_University_Department);							
+					indexEntity++;
+				}
+				
+				if(varOrgSchool != null) 
+				{							
+					features.put("Entity" + indexEntity + "_entityName", gate.Utils.stringFor(doc, varOrgSchool));
+					features.put("Entity" + indexEntity + "_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_University_Centers_And_Structures_And_Similar);							
+					indexEntity++;
+				}						
+				if(varOrg != null)
+				{
+					features.put("Entity" + indexEntity + "_entityName", gate.Utils.stringFor(doc, varOrg));
+					Object orgType = ((gate.Annotation)varOrg.iterator().next()).getFeatures().get("orgType");
+					if((orgType != null))
+					{								
+						if(orgType.equals("university"))
+						{							
+							features.put("Entity" + indexEntity + "_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_University);							
+						}
+						else
+						{
+							features.put("Entity" + indexEntity + "_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_Others);							
+						}
+					}
+					else
+					{
+						features.put("Entity" + indexEntity + "_type", eu.sisob.uma.api.prototypetextmining.gatedataextractor.Literals.EntityType_Others);							
+					}							
+				}			
+			
+				features.put("Title_name", gate.Utils.stringFor(doc, varAnnJob));
+				outputAS.add(varResearcherExpr.firstNode(), varResearcherExpr.lastNode(), sPrefix + postfix, features);		
+			}					
+		}
+		catch(Exception ex)
+		{
+			System.out.println("EXCEPTION ProfessionalActivityPattern7 FOUND");
+		}
+	}
+}
+
+
+//EXAMPLES
+/*
+	he moved to the ETH-Zürich to work as a post-doctoral research fellow in the group of Professor François Diederich
+	
+	REDUNDANT WITH ProfessionalActivityPattern3
+
+Rule: ProfessionalActivityPattern4
+Priority: 500
+(
+	(
+		(
+			(
+				(({Date}):varDateCT)?
+				({Token.string=="-"})?			
+				({Token.string==":"})?						
+			) 		
+			|
+			(
+				({Split.kind == external})				
+				(({Date}):varDateCT)
+				({Token.string=="."})
+			)
+		)?
+		(			
+			((PERSONMOVE): varMove)
+		) ?
+		(
+            ( 	
+				(
+					(								
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType == dept}):varOrgDept)
+							(ENTITY_SEPARATOR_2_2)
+						)?
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType == school}):varOrgSchool)
+							(ENTITY_SEPARATOR_2_2)
+						)?
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType != school,
+							   Organization.orgType != dept}):varOrg)
+							(ENTITY_SEPARATOR_2_2)
+						)
+					)
+					|
+					(								
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType != school,
+							   Organization.orgType != dept}):varOrg)
+							(ENTITY_SEPARATOR_2_2)
+						)
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType == school}):varOrgSchool)
+							(ENTITY_SEPARATOR_2_2)
+						)?
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType == dept}):varOrgDept)
+							(ENTITY_SEPARATOR_2_2)
+						)?
+					)
+					|					
+					(
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType == dept}):varOrgDept)
+							(ENTITY_SEPARATOR_2_2)
+						)?
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType == school}):varOrgSchool)
+							(ENTITY_SEPARATOR_2_2)
+						)
+					)
+					|
+					(
+						(
+							(ENTITY_SEPARATOR_2_1)
+							(({Organization.orgType == dept}):varOrgDept)
+							(ENTITY_SEPARATOR_2_2)
+						)
+					)
+				)
+				(ENTITY_SEPARATOR_2_1)
+				(({Date}):varDateOrg)?
+				(ENTITY_SEPARATOR_2_2)							
+			)[1,1]
+			(		
+				(
+					(ENTITY_SEPARATOR_2_1)
+					(({Location.locType == city}):varLocCity)
+					(ENTITY_SEPARATOR_2_2)
+				)?	
+				(
+					(ENTITY_SEPARATOR_2_1)
+					(({Location.locType == country}):varLocCountry)
+					(ENTITY_SEPARATOR_2_2)
+				)?							
+				(
+					(ENTITY_SEPARATOR_2_1)
+					(({Location.locType != city,
+					   Location.locType != country}):varLocRegion)
+					(ENTITY_SEPARATOR_2_2)
+				)?				
+				(
+					(
+						(COMMON_EXPRESSION_BEFOREJOB)
+						(ENTITY_SEPARATOR_2_1)						
+						(({JobTitle}):varJob)
+						(ENTITY_SEPARATOR_2_2)
+					)
+				)[1,1]				
+				(
+					(COMMON_EXPRESION_BEFOREDATE)
+					(ENTITY_SEPARATOR_3_1)					
+					(({Date}):varDate)
+					(ENTITY_SEPARATOR_2_2)
+				)?
+			)
+		)
+	)
+):varResearcherExp
+-->
+{
+	String sPrefix = "ProfessionalActivity4";
+
+	gate.AnnotationSet varResearcherExpr = (gate.AnnotationSet)bindings.get("varResearcherExp");
+
+	try
+	{
+		gate.FeatureMap features = Factory.newFeatureMap();
+		outputAS.add(varResearcherExpr.firstNode(), varResearcherExpr.lastNode(), sPrefix, features);
+	}
+	catch(Exception ex)
+	{
+	}		
+}
+*/
+
+
+

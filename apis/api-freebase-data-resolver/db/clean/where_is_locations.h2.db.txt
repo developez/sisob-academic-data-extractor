@@ -1,0 +1,3 @@
+Here is the folder where must to be "resolver.h2.db".
+
+If you do not find the file, find it here: http://sisob.lcc.uma.es/dataextractor

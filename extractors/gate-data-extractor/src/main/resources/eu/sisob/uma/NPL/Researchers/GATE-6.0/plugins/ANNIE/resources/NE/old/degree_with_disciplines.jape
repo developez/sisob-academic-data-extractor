@@ -1,0 +1,141 @@
+/*
+*  degree.jape
+*
+* Copyright (c) 1998-2004, The University of Sheffield.
+*
+*  This file is part of GATE (see http://gate.ac.uk/), and is free
+*  software, licenced under the GNU Library General Public License,
+*  Version 2, June 1991 (in the distribution as file licence.html,
+*  and also available at http://gate.ac.uk/gate/licence.html).
+*
+*  Diana Maynard, 10 Sep 2001
+* 
+*  $Id: jobtitle.jape 5921 2004-07-21 17:00:37Z akshay $
+*/
+
+Phase:	Degree
+Input: Lookup Token
+Options: control = appelt
+
+Rule: DegreePhd
+Priority: 360
+(	
+	({Lookup.majorType == degree_post})[0,2]
+	({Lookup.majorType == degree, Lookup.minorType == phd})
+    ({Token.string == "."})?    
+    (
+		({Token.string == "("})?
+		({Lookup.majorType == degree_post})
+		({Token.string == "."})?    
+		({Token.string == ")"})?
+	)[0,2]
+	({Token.root == "degree"})?
+	({Token.string == "studies"} | {Token.string == "Course"} | {Token.string == "course"})?
+    (
+		 ({Token.category == IN} | {Token.string == "("})?
+		 //({Token.category == DT})?
+		 ({Lookup.majorType == academic_disciplines})+
+		 (
+		  {Token.string == "and"}		   
+		  ({Token.category == JJ} | {Lookup.majorType == academic_disciplines})+
+		 )?       
+		 ({Token.string == ")"})?
+	)? 	
+	({Token.string == "studies"} | {Token.string == "Course"} | {Token.string == "course"})?
+	(
+		({Token.string == "("})?
+		({Lookup.majorType == degree_post})
+		({Token.string == "."})?    
+		({Token.string == ")"})?
+	)[0,2]
+)
+:degree
+-->
+ :degree.Degree = {rule = "DegreePhd", degreeType = phd} 
+ 
+Rule: DegreeOther
+Priority: 360
+(	
+	({Lookup.majorType == degree_post})[0,2]
+	({Lookup.majorType == degree, Lookup.minorType == other})
+    ({Token.string == "."})?    
+	(
+		({Token.string == "("})?
+		({Lookup.majorType == degree_post})
+		({Token.string == "."})?    
+		({Token.string == ")"})?
+	)[0,2]
+	({Token.root == "degree"})?
+	({Token.string == "studies"} | {Token.string == "Course"} | {Token.string == "course"})?
+    (
+		 ({Token.category == IN} | {Token.string == "("})?
+		 //({Token.category == DT})?
+		 ({Lookup.majorType == academic_disciplines})+
+		 (
+		  {Token.string == "and"}		   
+		  ({Token.category == JJ} | {Lookup.majorType == academic_disciplines})+
+		 )?            
+		 ({Token.string == ")"})?
+	)? 	
+	({Token.string == "studies"} | {Token.string == "Course"} | {Token.string == "course"})?
+	(
+		({Token.string == "("})?
+		({Lookup.majorType == degree_post})
+		({Token.string == "."})?    
+		({Token.string == ")"})?
+	)[0,2]
+)
+:degree
+-->
+ :degree.Degree = {rule = "DegreeOther", degreeType = degree} 
+ 
+Rule: DegreeOther2
+Priority: 340
+(	
+	(
+		({Lookup.majorType == degree_post})[0,2]
+		({Token.root == "degree"})
+		({Token.string == "studies"})?
+		(
+			 ({Token.category == IN} | {Token.string == "("})?
+			 //({Token.category == DT})?
+			 ({Lookup.majorType == academic_disciplines})+
+			 (
+			  {Token.string == "and"}		   
+			  ({Token.category == JJ} | {Lookup.majorType == academic_disciplines})+
+			 )?          
+			 ({Token.string == ")"})?
+		)? 	
+		({Token.string == "studies"})?
+		(
+		({Token.string == "("})?
+		({Lookup.majorType == degree_post})
+		({Token.string == "."})?    
+		({Token.string == ")"})?
+		)[0,2]
+	)
+	|
+	(
+		({Token.category == JJ} | {Lookup.majorType == academic_disciplines})+
+		(
+		  {Token.string == "and"}		   
+		  ({Token.category == JJ} | {Lookup.majorType == academic_disciplines})+
+		)?       
+		({Token.root == "degree"})
+		({Token.string == "studies"})?
+		(
+		({Token.string == "("})?
+		({Lookup.majorType == degree_post})
+		({Token.string == "."})?    
+		({Token.string == ")"})?
+	)[0,2]
+	)
+)
+:degree
+-->
+ :degree.Degree = {rule = "DegreeOther2", degreeType = degree} 
+ 
+ 
+ 
+ 
+

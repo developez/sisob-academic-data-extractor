@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>eu.sisob.uma</groupId>
+	<artifactId>sisob-data-extractor</artifactId>
+	<version>1.0.0-RELEASE</version>
+	<packaging>pom</packaging>
+	<name>sisob-data-extractor</name>
+	<description>This is the parent project for all projects of SISOB Data Extractor.</description>
+	<properties>
+    	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        </properties>	
+
+            <modules>
+
+                <module>apis/api-footils</module>
+                <module>apis/api-h2-db-pool</module>
+                <module>apis/api-threadpoolutils</module>
+
+                <module>apis/api-prototypeTextMining</module>
+                <module>apis/api-prototypeTextMiningGate</module>
+                <module>apis/api-prototypeTextMining-dataExchangeLiterals</module>         
+                <module>apis/api-prototypeTextMining-GateTransducerSupportLib</module>
+
+                <module>apis/api-freebase-data-resolver</module>         
+                <module>apis/api-extractors-data-format</module>
+                <module>apis/api-google-drive-utils</module>
+                <module>apis/api-crawler4j.2.6.1.mod</module>                
+
+                <module>extractors/gate-data-extractor</module>
+                <module>extractors/researcher-crawler-extractor</module>
+                <module>extractors/web-searchers-extractor</module>
+                <module>extractors/email-extractor</module>
+                <module>extractors/cv-files-inside-extractor</module>
+                
+                <module>data-extractor-server/data-extractor-rest-server-communications</module>                
+                <module>data-extractor-server/data-extractor-rest-server</module>
+                <module>data-extractor-server/data-extractor-rest-server-testing</module>
+                        
+            </modules>	
+</project>

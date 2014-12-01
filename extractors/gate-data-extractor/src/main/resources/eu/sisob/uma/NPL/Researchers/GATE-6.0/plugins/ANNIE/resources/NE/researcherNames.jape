@@ -1,0 +1,161 @@
+﻿/*
+*  name.jape
+*
+* Copyright (c) 1998-2004, The University of Sheffield.
+*
+*  This file is part of GATE (see http://gate.ac.uk/), and is free
+*  software, licenced under the GNU Library General Public License,
+*  Version 2, June 1991 (in the distribution as file licence.html,
+*  and also available at http://gate.ac.uk/gate/licence.html).
+*
+*  Diana Maynard, 10 Sep 2001
+* 
+*  $Id: name.jape 13147 2010-10-15 08:30:24Z markagreenwood $
+*/
+
+
+Phase:	EspNames
+Input: Token Lookup Title FirstPerson TempDate Split SpaceToken
+Options: control = appelt debug = false
+
+Macro: NEW_LINE
+(
+	(
+	{SpaceToken.kind == control} |	
+	{SpaceToken.string == "\n"} | 
+	{SpaceToken.string == "\n\r"}	
+	)
+)
+
+Macro: SPA_PREPOSITION_LAST_NAME
+(
+	(				 
+		{Token.string == "de"} |
+		{Token.string == "De"} |
+		{Token.string == "del"}	|		
+		{Token.string == "Del"}  |
+		(
+			{Token.string == "de"} 
+			{Token.string == "la"} 
+		) |
+		(
+			{Token.string == "De"} 
+			{Token.string == "La"} 
+		) |
+		(
+			{Token.string == "de"} 
+			{Token.string == "La"} 
+		) |
+		(
+			{Token.string == "De"} 
+			{Token.string == "la"} 
+		) |
+		(
+			{Token.string == "de"} 
+			{Token.string == "los"} 
+		) |
+		(
+			{Token.string == "De"} 
+			{Token.string == "Los"} 
+		) |
+		(
+			{Token.string == "de"} 
+			{Token.string == "Los"} 
+		) |
+		(
+			{Token.string == "De"} 
+			{Token.string == "los"} 
+		)|
+		(
+			{Token.string == "de"} 
+			{Token.string == "las"} 
+		) |
+		(
+			{Token.string == "De"} 
+			{Token.string == "Las"} 
+		) |
+		(
+			{Token.string == "de"} 
+			{Token.string == "Las"} 
+		) |
+		(
+			{Token.string == "De"} 
+			{Token.string == "las"} 
+		) 
+	)
+)
+
+Macro: SPACE
+(
+	({SpaceToken.kind == space})*
+)
+
+
+Macro: SPA_FIRST_NAME
+(	
+	(
+		(
+			{Lookup.majorType == person_first} |
+			(
+				{Token.kind == word, Token.length == 1} 
+				{Token.kind == punctuation}
+			)
+		)
+		(SPACE)
+		(SPA_PREPOSITION_LAST_NAME)?
+	)+	
+)
+/*
+(
+	({Lookup.majorType == person_first} (SPACE)) * {Lookup.majorType == person_first}
+)
+*/
+
+Macro: SPA_LAST_NAMES
+(		
+	((SPA_PREPOSITION_LAST_NAME)? {Lookup.majorType == person_last} (SPACE))+	
+)
+
+Macro: SPA_FULL_NAME
+(
+(SPA_FIRST_NAME) (SPACE) (SPA_LAST_NAMES) |
+(SPA_LAST_NAMES) {Token.kind == punctuation} (SPACE) (SPA_FIRST_NAME) |
+(SPA_LAST_NAMES) {Token.kind == punctuation} (SPA_FIRST_NAME) 
+)
+
+Rule: MakeResearcherName
+priority:20
+(	
+	(SPA_FULL_NAME) 
+):person
+-->
+:person.Person = {rule="MakeResearcherName", kind = ResearcherName}
+
+/*
+
+Rule: MakeResearcherName2
+priority:20
+(	
+	(SPA_PREPOSITION_LAST_NAME)		
+):varName
+-->
+:varName.PrepositionLast = {rule="MakeResearcherName2", kind = PrepositionLast}
+
+
+
+Rule: MakeResearcherName3
+priority:20
+(	
+	(SPA_LAST_NAMES)		
+):varName
+-->
+:varName.SP_LAST_NAMES = {rule="MakeResearcherName3"}
+
+Rule: MakeResearcherName3
+priority:20
+(	
+	(SPA_FIRST_NAME)		
+):varName
+-->
+:varName.SPA_FIRST_NAME = {rule="MakeResearcherName3"}
+*/

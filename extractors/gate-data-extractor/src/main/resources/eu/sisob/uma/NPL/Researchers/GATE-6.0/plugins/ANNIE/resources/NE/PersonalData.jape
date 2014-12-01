@@ -1,0 +1,270 @@
+/*
+*  MobilityActions.jape
+*
+* Copyright (c) 1998-2004, The University of Sheffield.
+*
+*  This file is part of GATE (see http://gate.ac.uk/), and is free
+*  software, licenced under the GNU Library General Public License,
+*  Version 2, June 1991 (in the distribution as file licence.html,
+*  and also available at http://gate.ac.uk/gate/licence.html).
+*
+*  Diana Maynard, 10 Sep 2001
+* 
+*  $Id: MobilityActions.jape 13147 2010-10-15 08:30:24Z markagreenwood $
+*/
+
+Phase:	PersonalData
+Input: Split Token Lookup Person Date Location Phone Email
+Options: control = appelt debug = true
+
+Macro: BIRTHDAY_SUBSET_NAME
+(
+	(
+		{Token.root=="date"}
+		{Token.root=="of"}
+		{Token.root=="birth"}
+	)
+	|
+	(
+		{Token.root=="dob"}		
+	)	
+	|
+	(
+		{Token.root=="d"}		
+		{Token.root=="."}		
+		{Token.root=="o"}		
+		{Token.root=="."}		
+		{Token.root=="b"}		
+	)	
+	|
+	(
+		{Token.root=="birthday"}	
+	)	
+	|
+	(	
+		{Token.root=="birthdate-"}	
+	)	
+)
+
+Macro: PLACE_OF_BIRTH_SUBSET_NAME
+(
+	(
+		{Token.root=="place"}
+		{Token.root=="of"}
+		{Token.root=="birth"}
+	)
+	|
+	(
+		{Token.root=="pob"}		
+	)
+)
+
+Macro: NATIONALITY_SUBSET_NAME
+(
+	(
+		{Token.root=="nationality"}		
+	)	
+	|
+	(
+		{Token.root=="nationality-"}		
+	)	
+)
+
+Rule: BirthDay1
+Priority: 300
+(	
+	(BIRTHDAY_SUBSET_NAME)
+	({Token.root == ":"} | {Token.root == "."})?
+	({Date.kind==day_month_year}):birth_date
+)
+:exp -->
+{	
+	gate.FeatureMap features = Factory.newFeatureMap();
+	
+	gate.AnnotationSet exp = (gate.AnnotationSet)bindings.get("exp");
+	gate.AnnotationSet birth_date = (gate.AnnotationSet)bindings.get("birth_date");
+	gate.Annotation dateAnn = (gate.Annotation)birth_date.iterator().next();	
+	
+	Object year1 = dateAnn.getFeatures().get("year1");
+	if((year1 != null))
+		features.put("BirthDateYear", year1.toString());
+		
+	Object month1 = dateAnn.getFeatures().get("month1");
+	if((month1 != null))
+		features.put("BirthDateMonthYear", month1.toString());
+		
+	Object day1 = dateAnn.getFeatures().get("day1");
+	if((day1 != null))
+		features.put("BirthDateDayMonthYear", day1.toString());	
+
+	features.put("rule", "BirthDay1");	
+
+	outputAS.add(exp.firstNode(), exp.lastNode(), "AgentIdentification", features);	
+}
+
+Rule: BirthDay2
+Priority: 300
+(	
+	(
+		(
+			{Token.string=="born"}	
+		)
+		|
+		(
+			{Token.string=="Born"}	
+		)
+	)
+	({Token.root == ":"} | {Token.root == "."})?
+	({Date.kind==day_month_year}):birth_date
+	(
+		(ENTITY_SEPARATOR_2_1)
+		(({Location.locType == city}):varLocCity)
+		(ENTITY_SEPARATOR_2_2)
+	)?
+	(
+		(ENTITY_SEPARATOR_2_1)
+		(({Location.locType == region}):varLocRegion)
+		(ENTITY_SEPARATOR_2_2)
+	)?
+	(
+		(ENTITY_SEPARATOR_2_1)
+		(({Location.locType == country}):varLocCountry)
+		(ENTITY_SEPARATOR_2_2)
+	)?
+)
+:exp -->
+{	
+	gate.FeatureMap features = Factory.newFeatureMap();
+	
+	gate.AnnotationSet exp = (gate.AnnotationSet)bindings.get("exp");
+	gate.AnnotationSet birth_date = (gate.AnnotationSet)bindings.get("birth_date");
+	gate.Annotation dateAnn = (gate.Annotation)birth_date.iterator().next();	
+	
+	Object year1 = dateAnn.getFeatures().get("year1");
+	if((year1 != null))
+		features.put("BirthDateYear", year1.toString());
+		
+	Object month1 = dateAnn.getFeatures().get("month1");
+	if((month1 != null))
+		features.put("BirthDateMonthYear", month1.toString());
+		
+	Object day1 = dateAnn.getFeatures().get("day1");
+	if((day1 != null))
+		features.put("BirthDateDayMonthYear", day1.toString());	
+		
+	gate.AnnotationSet varLocCity = (gate.AnnotationSet)bindings.get("varLocCity");
+	gate.AnnotationSet varLocCountry = (gate.AnnotationSet)bindings.get("varLocCountry");
+	gate.AnnotationSet varLocRegion = (gate.AnnotationSet)bindings.get("varLocRegion");
+	if(varLocCity != null) features.put("BirthCity", gate.Utils.stringFor(doc, varLocCity));
+	if(varLocCountry != null) features.put("BirthCountry", gate.Utils.stringFor(doc, varLocCountry));
+	if(varLocRegion != null) features.put("BirthRegion", gate.Utils.stringFor(doc, varLocRegion));
+
+	features.put("rule", "BirthDay2");		
+
+	outputAS.add(exp.firstNode(), exp.lastNode(), "AgentIdentification", features);	
+}	
+
+Rule: PlaceOfBirth1
+Priority: 300
+(
+	(PLACE_OF_BIRTH_SUBSET_NAME)
+	({Token.root == ":"} | {Token.root == "."})?
+	(
+		(ENTITY_SEPARATOR_2_1)
+		(({Location.locType == city}):varLocCity)
+		(ENTITY_SEPARATOR_2_2)
+	)?
+	(
+		(ENTITY_SEPARATOR_2_1)
+		(({Location.locType == region}):varLocRegion)
+		(ENTITY_SEPARATOR_2_2)
+	)?
+	(
+		(ENTITY_SEPARATOR_2_1)
+		(({Location.locType == country}):varLocCountry)
+		(ENTITY_SEPARATOR_2_2)
+	)?
+)
+:exp -->
+{	
+	gate.FeatureMap features = Factory.newFeatureMap();
+	
+	gate.AnnotationSet exp = (gate.AnnotationSet)bindings.get("exp");	
+	
+	gate.AnnotationSet varLocCity = (gate.AnnotationSet)bindings.get("varLocCity");
+	gate.AnnotationSet varLocCountry = (gate.AnnotationSet)bindings.get("varLocCountry");
+	gate.AnnotationSet varLocRegion = (gate.AnnotationSet)bindings.get("varLocRegion");
+	if(varLocCity != null) features.put("BirthCity", gate.Utils.stringFor(doc, varLocCity));
+	if(varLocCountry != null) features.put("BirthCountry", gate.Utils.stringFor(doc, varLocCountry));
+	if(varLocRegion != null) features.put("BirthRegion", gate.Utils.stringFor(doc, varLocRegion));
+	
+	features.put("rule", "PlaceOfBirth1");
+	
+	outputAS.add(exp.firstNode(), exp.lastNode(), "AgentIdentification", features);
+}
+
+Rule: Nationality1
+Priority: 300
+(
+	(NATIONALITY_SUBSET_NAME)
+	({Token.root == ":"} | {Token.root == "."})?
+	(
+		(ENTITY_SEPARATOR_2_1)
+		(({Lookup.majorType == nationality}):varNationality)
+		(ENTITY_SEPARATOR_2_2)
+	)?	
+)
+:exp -->
+{	
+	gate.FeatureMap features = Factory.newFeatureMap();
+	
+	gate.AnnotationSet exp = (gate.AnnotationSet)bindings.get("exp");	
+	
+	gate.AnnotationSet varNationality = (gate.AnnotationSet)bindings.get("varNationality");
+	if(varNationality != null) features.put("Nationality", gate.Utils.stringFor(doc, varNationality));
+	
+	features.put("rule", "Nationality1");
+	
+	outputAS.add(exp.firstNode(), exp.lastNode(), "AgentIdentification", features);
+}
+
+Rule: Phone1
+Priority: 300
+(
+	({Phone}):varPhone
+)
+:exp -->
+{	
+	gate.FeatureMap features = Factory.newFeatureMap();
+	
+	gate.AnnotationSet exp = (gate.AnnotationSet)bindings.get("exp");	
+	
+	gate.AnnotationSet varPhone = (gate.AnnotationSet)bindings.get("varPhone");
+	if(varPhone != null) features.put("Phone", gate.Utils.stringFor(doc, varPhone));
+	
+	features.put("rule", "Telephone1");
+	
+	outputAS.add(exp.firstNode(), exp.lastNode(), "AgentIdentification", features);
+}
+
+Rule: Email1
+Priority: 300
+(
+	({Email}):varEmail
+)
+:exp -->
+{	
+	gate.FeatureMap features = Factory.newFeatureMap();
+	
+	gate.AnnotationSet exp = (gate.AnnotationSet)bindings.get("exp");	
+	
+	gate.AnnotationSet varEmail = (gate.AnnotationSet)bindings.get("varEmail");
+	if(varEmail != null) features.put("Email", gate.Utils.stringFor(doc, varEmail));
+	
+	features.put("rule", "Email1");
+	
+	outputAS.add(exp.firstNode(), exp.lastNode(), "AgentIdentification", features);
+}
+
+
+

@@ -1,0 +1,11 @@
+Phase:	BadExpressions
+Input: Token Lookup Title FirstPerson TempDate Split
+Options: control = appelt debug = false
+
+Rule: BadExpressions1
+Priority: 2000
+(
+	({Lookup.majorType == bad_expressions})
+):bad_expressions
+-->
+ :bad_expressions.BadExpression = {kind = "bad_expressions", rule = "BadExpressions1"}

@@ -1,0 +1,362 @@
+﻿Phase:	Name_Person
+Input: Token Lookup Title FirstPerson TempDate Split
+Options: control = appelt debug = false
+
+///////////////////////////////////////////////////////////////
+
+// Person Rules
+
+/////////////////////////////////////////////////////////////////
+Macro: TITLE
+(
+ {Title}
+ ({Token.string == "."})?
+)
+Macro: INITIALS
+(
+  ({Token.orth == upperInitial, Token.length =="1", Token.string!="Ð"}
+  ({Token.string == "."})?
+  )+
+)
+
+Macro: INITIALS2
+
+(
+  {Token.orth == allCaps, Token.length == "2"}
+  ({Token.string == "."}) 
+)
+
+
+Macro: FIRSTNAME
+(
+ ({FirstPerson.gender == male} |
+  {FirstPerson.gender == female})
+ |
+ (INITIALS)
+)
+
+Macro: FIRSTNAMEAMBIG
+(
+ {Lookup.majorType == person_first, Lookup.minorType == ambig}
+)
+
+Macro: UPPER
+(
+ ({Token.category == NNP}| 
+ {Token.orth == upperInitial, Token.lentgh > 1}|
+ {Token.orth == mixedCaps} 
+)
+ ({Token.string == "-"}
+  {Token.category == NNP}
+ )?
+)
+
+Macro: PERSONENDING
+(
+ {Lookup.majorType == person_ending}
+)
+
+Macro: PREFIX
+(
+ ({Lookup.majorType == surname, Lookup.minorType == prefix}
+ )|
+ (({Token.string == "O"}|{Token.string == "D"})
+  {Token.string == "'"}
+ )
+)
+///////////////////////////////////////////////////////////
+
+
+// Person Rules
+
+Rule: Pronoun
+Priority: 1000
+//stops personal pronouns being recognised as Initials
+(
+ {Token.category == PP}|
+ {Token.category == PRP}|
+ {Token.category == RB}
+):pro
+-->
+{}
+
+ 
+
+Rule:	GazPerson
+Priority: 50
+(
+ {Lookup.majorType == person_full}
+)
+:person -->
+{
+gate.AnnotationSet person = (gate.AnnotationSet)bindings.get("person");
+gate.Annotation personAnn = (gate.Annotation)person.iterator().next();
+gate.FeatureMap features = Factory.newFeatureMap();
+features.put("kind", "personName");
+features.put("rule", "GazPerson");
+outputAS.add(person.firstNode(), person.lastNode(), "TempPerson",
+features);
+}
+
+Rule:	TheGazPersonFirst
+Priority: 200
+(
+ {Token.category == DT}|
+ {Token.category == PRP}|
+ {Token.category == RB}
+)
+(
+ {FirstPerson}
+)
+:person 
+( 
+ {Token.orth == upperInitial, Token.length == "1"}
+)?
+-->
+{
+gate.AnnotationSet person = (gate.AnnotationSet)bindings.get("person");
+gate.Annotation personAnn = (gate.Annotation)person.iterator().next();
+gate.FeatureMap features = Factory.newFeatureMap();
+features.put("gender", personAnn.getFeatures().get("gender"));
+features.put("kind", "personName");
+features.put("rule", "GazPersonFirst");
+outputAS.add(person.firstNode(), person.lastNode(), "TempPerson",
+features);
+//outputAS.removeAll(person);
+}
+
+
+Rule:	GazPersonFirst
+Priority: 70
+(
+ {FirstPerson}
+)
+:person 
+( 
+ {Token.orth == upperInitial, Token.length == "1"}
+)?
+-->
+{
+gate.AnnotationSet person = (gate.AnnotationSet)bindings.get("person");
+gate.Annotation personAnn = (gate.Annotation)person.iterator().next();
+gate.FeatureMap features = Factory.newFeatureMap();
+features.put("gender", personAnn.getFeatures().get("gender"));
+features.put("kind", "personName");
+features.put("rule", "GazPersonFirst");
+outputAS.add(person.firstNode(), person.lastNode(), "TempPerson",
+features);
+//outputAS.removeAll(person);
+}
+
+
+Rule: NotFirstPersonStop
+Priority: 50
+// ambig first name and surname is stop word
+// e.g. Will And
+
+(
+ ((FIRSTNAMEAMBIG)+ | 
+  {Token.category == PRP}|
+  {Token.category == DT}
+ )
+ ({Lookup.majorType == stop}
+ )
+)
+:person -->
+  {}
+Rule: FirstPersonStop
+Priority: 50
+// John And
+
+(
+ {FirstPerson}
+):person
+(
+ {Token.category == DT}|
+ {Token.category == PRP}|
+ {Token.category == RB}|
+ {Token.category == IN}
+)
+-->
+{
+gate.AnnotationSet person = (gate.AnnotationSet)bindings.get("person");
+gate.Annotation personAnn = (gate.Annotation)person.iterator().next();
+gate.FeatureMap features = Factory.newFeatureMap();
+features.put("gender", personAnn.getFeatures().get("gender"));
+features.put("kind", "personName");
+features.put("rule", "GazPersonFirst");
+outputAS.add(person.firstNode(), person.lastNode(), "TempPerson",
+features);
+}
+
+
+
+
+
+Rule: NotPersonFull
+Priority: 50
+// do not allow Det + Surname
+(
+ {Token.category == DT}|
+ {Token.category == PRP}|
+ {Token.category == RB}
+)
+(
+ (PREFIX)* 
+ (UPPER)
+ (PERSONENDING)?
+):foo
+-->
+{}
+
+Rule: PersonFull
+Priority: 100
+// F.W. Jones
+// Fred Jones
+(
+ {Token.category == DT}
+)?
+//({Token.string != ".", Token.string != "Ð"})  
+( 
+ (
+	(FIRSTNAME | FIRSTNAMEAMBIG) )+
+ (PREFIX)*
+ (UPPER)
+ (PERSONENDING)?
+)
+:person -->
+{
+ gate.FeatureMap features = Factory.newFeatureMap();
+gate.AnnotationSet personSet = (gate.AnnotationSet)bindings.get("person");
+  
+  //get all firstPerson annotations that have a gender feature
+    HashSet fNames = new HashSet();
+    fNames.add("gender");
+    gate.AnnotationSet firstPerson = personSet.get("FirstPerson", fNames);
+
+  if (firstPerson != null && firstPerson.size()>0)
+ {
+    //Out.prln("First persons found " +  firstPerson);
+  gate.Annotation personAnn = (gate.Annotation)firstPerson.iterator().next();
+  features.put("gender", personAnn.getFeatures().get("gender"));
+}
+  features.put("kind", "personName");
+  features.put("rule", "PersonFull");
+outputAS.add(personSet.firstNode(), personSet.lastNode(), "TempPerson",
+features);
+}
+
+Rule: PersonFullStop
+Priority: 50
+// G.Wilson Fri
+
+(
+ ((FIRSTNAME | FIRSTNAMEAMBIG) )
+ (PREFIX)* 
+ (UPPER)
+):person
+(
+ {Lookup.majorType == date}
+)
+-->
+ :person.TempPerson = {kind = "personName", rule = "PersonFullStop"}
+
+
+Rule: NotPersonFullReverse
+Priority: 20
+// XYZ, I
+(
+ (UPPER)
+ {Token.string == ","}
+ {Token.category == PRP}
+ (PERSONENDING)?
+)
+:unknown 
+-->
+{}
+
+Rule: 	PersonFullReverse
+Priority: 500
+// Jones, F.W.
+// don't allow Jones, Fred because too ambiguous
+// Smith, TF
+
+(
+ {Token.category ==NNP}
+ {Token.string == ","}
+ (INITIALS | INITIALS2)+ 
+ (PERSONENDING)?
+)
+:person -->
+{
+ gate.FeatureMap features = Factory.newFeatureMap();
+gate.AnnotationSet personSet = (gate.AnnotationSet)bindings.get("person");
+gate.AnnotationSet firstPerson = (gate.AnnotationSet)personSet.get("FirstPerson");
+if (firstPerson != null && firstPerson.size()>0)
+{
+  gate.Annotation personAnn = (gate.Annotation)firstPerson.iterator().next();
+  features.put("gender", personAnn.getFeatures().get("gender"));
+}
+  features.put("kind", "personName");
+  features.put("rule", "PersonFullReverse");
+outputAS.add(personSet.firstNode(), personSet.lastNode(), "TempPerson",
+features);
+}
+
+
+Rule:  PersonSaint
+Priority: 50
+// Note: ensure that it's not a Saints Day first
+(
+ ({Token.string == "St"} ({Token.string == "."})? |
+ {Token.string == "Saint"})
+ (FIRSTNAME)
+ )
+:person -->
+{
+ gate.FeatureMap features = Factory.newFeatureMap();
+gate.AnnotationSet personSet = (gate.AnnotationSet)bindings.get("person");
+gate.AnnotationSet firstPerson = (gate.AnnotationSet)personSet.get("FirstPerson");
+if (firstPerson != null && firstPerson.size()>0)
+{
+  gate.Annotation personAnn = (gate.Annotation)firstPerson.iterator().next();
+  features.put("gender", personAnn.getFeatures().get("gender"));
+}
+  features.put("kind", "personName");
+  features.put("rule", "PersonSaint");
+outputAS.add(personSet.firstNode(), personSet.lastNode(), "TempPerson",
+features);
+}
+
+Rule:  PersonAcademic
+Priority: 100
+(
+	   {Token.string == "Professor"} | 
+	   {Token.string == "Prof."} | 	
+	   {Token.string == "Prof"} | 	
+	   {Token.string == "Doctor"} | 		
+	   {Token.string == "Dr"} | 			   
+	   {Token.string == "Dr."} 
+)			
+(	
+     (
+		(FIRSTNAME) |
+		(
+		 ({Lookup.majorType == person_first})[1,2]
+		)
+	 )
+) :person -->
+{
+    gate.FeatureMap features = Factory.newFeatureMap();
+	gate.AnnotationSet personSet = (gate.AnnotationSet)bindings.get("person");
+	gate.AnnotationSet firstPerson = (gate.AnnotationSet)personSet.get("FirstPerson");
+	if (firstPerson != null && firstPerson.size()>0)
+	{
+		gate.Annotation personAnn = (gate.Annotation)firstPerson.iterator().next();
+	    features.put("gender", personAnn.getFeatures().get("gender"));
+	}
+	
+	features.put("kind", "personName");
+	features.put("rule", "PersonAcademic");
+	outputAS.add(personSet.firstNode(), personSet.lastNode(), "TempPerson",	features);
+}

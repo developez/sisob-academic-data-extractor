@@ -1,0 +1,436 @@
+
+/*
+Rule: ProfessionalActivityPattern2
+Priority: 490
+(
+	(
+        (
+			(({Date}):varDateCT)?
+			({Token.string=="-"})?			
+			({Token.string==":"})?			
+		)? 		
+		(
+			(
+				( 				
+					(ENTITY_SEPARATOR_1)
+					({JobTitle}):varJob		
+				)
+				(
+					(ENTITY_SEPARATOR_2_1)
+					(({Date}):varDateJob)?
+					(ENTITY_SEPARATOR_2_2)
+				)			
+			)[2,8]
+			(
+				(ENTITY_SEPARATOR_2_1)
+				(({Organization.orgType == dept}):varOrg)?
+				(ENTITY_SEPARATOR_2_2)
+				
+				(ENTITY_SEPARATOR_2_1)
+				(({Organization.orgType == school}):varOrg)?
+				(ENTITY_SEPARATOR_2_2)
+				
+				(ENTITY_SEPARATOR_2_1)
+				(({Organization}):varOrg)
+				(ENTITY_SEPARATOR_2_2)
+				
+				(ENTITY_SEPARATOR_2_1)
+				(({Location}):varLoc)?
+				(ENTITY_SEPARATOR_2_2)
+				
+				(ENTITY_SEPARATOR_2_1)
+				(({Date}):varDate)?
+				(ENTITY_SEPARATOR_2_2)
+			)
+		)
+	)
+):varResearcherExp
+-->
+{
+	String sPrefix = "ProfessionalActivity";
+    String namePattern = "ProfessionalActivityPattern2";
+	boolean noperson = false;
+	if(sPrefix == null && (gate.AnnotationSet)bindings.get("varToBePresent") != null) sPrefix += "Current";
+	if(sPrefix == null && (gate.AnnotationSet)bindings.get("varToBePast") != null) sPrefix += "NoCurrent";
+	if(sPrefix == null && (gate.AnnotationSet)bindings.get("varVerbPast") != null) sPrefix += "NoCurrent";
+	if(sPrefix == null && (gate.AnnotationSet)bindings.get("varDateCT") != null) sPrefix += "NoCurrent";
+	if(sPrefix == null)
+	{
+        sPrefix += "NoCurrent";
+		noperson = true;
+	}
+	//FIXME
+	sPrefix = "ProfessionalActivity";
+	
+	gate.AnnotationSet varDateCT = (gate.AnnotationSet)bindings.get("varDateCT");
+	gate.AnnotationSet varJob = (gate.AnnotationSet)bindings.get("varJob");	
+	gate.AnnotationSet varOrg = (gate.AnnotationSet)bindings.get("varOrg");
+	gate.AnnotationSet varLoc = (gate.AnnotationSet)bindings.get("varLoc");
+	gate.AnnotationSet varDate = (gate.AnnotationSet)bindings.get("varDate");
+
+	int num = 0;
+
+	if(!noperson) num = 1;
+	if(varDateCT != null) num++;
+	if(varDate != null) num++;
+	if(varOrg != null) num++;
+	if(varLoc != null) num++;
+    if(varJob != null) num++;
+
+	gate.AnnotationSet varResearcherExpr = (gate.AnnotationSet)bindings.get("varResearcherExp");
+
+	if(varResearcherExpr != null)
+	try
+	{
+		gate.FeatureMap features = Factory.newFeatureMap();
+		features.put("rule",namePattern);
+		outputAS.add(varResearcherExpr.firstNode(), varResearcherExpr.lastNode(), (num <= 1 ? "PoorExpression" : sPrefix), features);
+	}
+	catch(Exception ex)
+	{
+	}
+}
+*/
+
+/*
+Rule: ProfessionalActivityPattern
+Priority: 200
+(
+	(
+        (
+			(({Date}):varDateCT)
+			({Token.string=="-"})?			
+			({Token.string==":"})?			
+		) ?
+		(
+			((PERSONTOBEPRESENT) :varToBePresent) |
+			((PERSONTOBEPAST) : varToBePast) |
+			((PERSONTOWORKVERBPAST) :varVerbPast)
+		) ?
+		(
+             (				
+				(ENTITY_SEPARATOR_1)
+				({JobTitle}):varJob				
+			)[1,4]
+			(
+				(ENTITY_SEPARATOR_2_1)
+				(
+					(																								
+						({Location}):varLoc						
+					) |
+					(
+						({Organization}):varOrg                                                        						
+					) |
+					(					
+						({Date}):varDate
+					)
+				)
+				(ENTITY_SEPARATOR_2_2)
+			)[0,20]
+		)
+	)
+):varResearcherExp
+-->
+{    
+    String sPrefix = "ProfessionalActivity";
+    String namePattern = "ResearcherJobOrgPattern";
+	boolean noperson = false;
+	if(sPrefix == null && (gate.AnnotationSet)bindings.get("varToBePresent") != null) sPrefix += "Current";
+	if(sPrefix == null && (gate.AnnotationSet)bindings.get("varToBePast") != null) sPrefix += "NoCurrent";
+	if(sPrefix == null && (gate.AnnotationSet)bindings.get("varVerbPast") != null) sPrefix += "NoCurrent";
+	if(sPrefix == null && (gate.AnnotationSet)bindings.get("varDateCT") != null) sPrefix += "NoCurrent";
+	if(sPrefix == null)
+	{
+        sPrefix += "NoCurrent";
+		noperson = true;
+	}
+	//FIXME
+	sPrefix = "ProfessionalActivity";
+	
+	gate.AnnotationSet varDateCT = (gate.AnnotationSet)bindings.get("varDateCT");
+	gate.AnnotationSet varJob = (gate.AnnotationSet)bindings.get("varJob");	
+	gate.AnnotationSet varOrg = (gate.AnnotationSet)bindings.get("varOrg");
+	gate.AnnotationSet varLoc = (gate.AnnotationSet)bindings.get("varLoc");
+	gate.AnnotationSet varDate = (gate.AnnotationSet)bindings.get("varDate");
+
+	int num = 0;
+
+	if(!noperson) num = 1;
+	if(varDateCT != null) num++;
+	if(varDate != null) num++;
+	if(varOrg != null) num++;
+	if(varLoc != null) num++;
+    if(varJob != null) num++;
+
+	gate.AnnotationSet varResearcherExpr = (gate.AnnotationSet)bindings.get("varResearcherExp");
+
+	if(varResearcherExpr != null)
+	try
+	{
+		gate.FeatureMap features = Factory.newFeatureMap();
+		features.put("rule",namePattern);
+		outputAS.add(varResearcherExpr.firstNode(), varResearcherExpr.lastNode(), (num <= 1 ? "PoorExpression" : sPrefix), features);
+	}
+	catch(Exception ex)
+	{
+	}
+
+	if(num > 0)
+	{
+
+		if(varDateCT != null)
+		try
+		{
+			gate.FeatureMap features = Factory.newFeatureMap();
+			features.put("rule",namePattern);
+			outputAS.add(varDateCT.firstNode(), varDateCT.lastNode(), sPrefix + "_" + "DateInit", features);
+		}
+		catch(Exception ex)
+		{
+		}
+
+		String nameAnn = "";
+		String nameAnnAux = "";
+		gate.AnnotationSet annSetAux = null;
+
+		annSetAux = varJob;
+		nameAnn = sPrefix + "_" + "Title_name";
+		if(annSetAux != null)
+		{
+			for (gate.Annotation varAnn : annSetAux) 
+			{
+				gate.FeatureMap features = Factory.newFeatureMap();
+				features.put("rule",namePattern);
+				try
+				{
+					outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), nameAnn, features);
+				}
+				catch(Exception ex)
+				{
+				}	
+			}	
+		}		
+
+		annSetAux = varOrg;
+		nameAnn = sPrefix + "_" + "Entity";
+		nameAnnAux = "";
+		if(annSetAux != null)
+		{					
+			for (gate.Annotation varAnn : annSetAux) 
+			{
+				nameAnnAux = nameAnn;
+				gate.FeatureMap features = Factory.newFeatureMap(); 
+				features.put("rule",namePattern); 
+				Object orgType = varAnn.getFeatures().get("orgType");
+				if((orgType != null))
+				{
+					if(orgType.equals("school")) nameAnnAux += "Fac";
+					else if(orgType.equals("dept")) nameAnnAux += "Dep";							
+				}				
+				   
+				try
+				{
+					outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), nameAnnAux + "_entityName", features);
+				}
+				catch(Exception ex)
+				{
+				}			
+			}			
+			
+		}
+
+		annSetAux = varLoc;
+		nameAnn = sPrefix + "_" + "PlaceJob";		
+		nameAnnAux = "";
+		if(annSetAux != null)
+		{
+			for (gate.Annotation varAnn : annSetAux) 
+			{
+				nameAnnAux = nameAnn;
+				gate.FeatureMap features = Factory.newFeatureMap(); 
+				features.put("rule",namePattern); 
+				Object orgType = varAnn.getFeatures().get("locType");
+				if(orgType != null)
+				{
+					if(orgType.equals("city")) nameAnnAux += "_city";
+					else if(orgType.equals("country")) nameAnnAux += "_countryName";
+					else nameAnnAux += "_region";					
+				}
+				else nameAnnAux += "_region";										
+				
+				try
+				{
+					outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), nameAnnAux, features);
+				}
+				catch(Exception ex)
+				{
+				}			
+			}
+		}
+
+		annSetAux = varDate;
+		nameAnn = sPrefix + "_" + "DateInit";
+		if(annSetAux != null)
+		{
+			for (gate.Annotation varAnn : annSetAux) 
+			{
+				gate.FeatureMap features = Factory.newFeatureMap();
+				features.put("rule",namePattern);
+				try
+				{
+					outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), nameAnn, features);
+				}
+				catch(Exception ex)
+				{
+				}	
+			}						
+		}
+
+	}
+}
+*/
+
+gate.AnnotationSet varResearcherExpr = (gate.AnnotationSet)bindings.get("varResearcherExp");		
+	
+	if(varResearcherExpr != null)
+	try
+	{
+		gate.FeatureMap features = Factory.newFeatureMap();
+		features.put("rule",namePattern);
+		try
+		{
+				outputAS.add(varResearcherExpr.firstNode(), varResearcherExpr.lastNode(), (num < 1 ? "PoorExpression" : sPrefix), features);
+		}
+		catch(Exception ex)
+		{
+		}
+	}
+	catch(Exception ex)
+	{
+	}
+	
+	//if(num > 0)
+	{	
+		if(varDateCT != null && varDate ==  null)
+		try
+		{
+			gate.FeatureMap features = Factory.newFeatureMap(); 
+			features.put("rule",namePattern);
+			outputAS.add(varDateCT.firstNode(), varDateCT.lastNode(), sPrefix + "_" + "DateTitle", features);
+		}
+		catch(Exception ex)
+		{
+		}	
+
+                
+		String nameAnn = "";
+		String nameAnnAux = "";
+		gate.AnnotationSet annSetAux = null;		
+		
+		annSetAux = varDegree;
+		nameAnn = sPrefix + "_" + "Title_name";
+		nameAnnAux = "";
+		if(annSetAux != null)
+		{					
+			for (gate.Annotation varAnn : annSetAux) 
+			{				
+				gate.FeatureMap features = Factory.newFeatureMap(); 
+				features.put("rule",namePattern); 
+				Object degreeType = varAnn.getFeatures().get("degreeType");
+				if((degreeType != null))
+				{
+					if(degreeType.equals("phd")) nameAnnAux = sPrefix + "PhDStudies" + "_Title_name";
+					else if(degreeType.equals("degree")) nameAnnAux = sPrefix + "Degree" + "_Title_name";					
+				}				
+				else
+					nameAnnAux = sPrefix + "Degree" + "_Title_name";	
+					
+				try
+				{
+					outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), nameAnnAux, features);
+				}
+				catch(Exception ex)
+				{
+				}			
+			}			
+			
+		}
+	
+        annSetAux = varOrg;
+		nameAnn = sPrefix + "_" + "EntityTitle";
+		nameAnnAux = "";
+		if(annSetAux != null)
+		{					
+			for (gate.Annotation varAnn : annSetAux) 
+			{
+				nameAnnAux = nameAnn;
+				gate.FeatureMap features = Factory.newFeatureMap(); 
+				features.put("rule",namePattern); 
+				Object orgType = varAnn.getFeatures().get("orgType");
+				if((orgType != null))
+				{
+					//FIXME (mirar type)
+					//if(orgType.equals("school")) nameAnnAux += "Fac";
+					//else if(orgType.equals("dept")) nameAnnAux += "Dep";							
+				}				
+				   
+				try
+				{
+					outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), nameAnnAux + "_entityName", features);
+				}
+				catch(Exception ex)
+				{
+				}			
+			}			
+			
+		}
+
+		annSetAux = varLoc;
+		nameAnn = sPrefix + "_" + "PlaceTitle";		
+		nameAnnAux = "";
+		if(annSetAux != null)
+		{
+			for (gate.Annotation varAnn : annSetAux) 
+			{
+				nameAnnAux = nameAnn;
+				gate.FeatureMap features = Factory.newFeatureMap(); 
+				features.put("rule",namePattern); 
+				Object orgType = varAnn.getFeatures().get("locType");
+				if(orgType != null)
+				{
+					if(orgType.equals("city")) nameAnnAux += "_city";
+					else if(orgType.equals("country")) nameAnnAux += "_countryName";
+					else nameAnnAux += "_region";					
+				}
+				else nameAnnAux += "_region";										
+				
+				try
+				{
+					outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), nameAnnAux, features);
+				}
+				catch(Exception ex)
+				{
+				}			
+			}
+		}
+
+        annSetAux = varDate;
+        nameAnn = sPrefix + "_" + "DateTitle";
+		if(annSetAux != null)
+        {
+			for (gate.Annotation varAnn : annSetAux) 
+			{
+				gate.FeatureMap features = Factory.newFeatureMap();
+				features.put("rule",namePattern);
+				try
+				{
+					outputAS.add(varAnn.getStartNode().getOffset(), varAnn.getEndNode().getOffset(), nameAnn, features);
+				}
+				catch(Exception ex)
+				{
+				}	
+			}	
+		}
+	}			
+}
+

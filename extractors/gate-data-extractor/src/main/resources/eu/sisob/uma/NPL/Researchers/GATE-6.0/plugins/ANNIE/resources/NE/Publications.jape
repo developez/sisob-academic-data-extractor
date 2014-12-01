@@ -1,0 +1,394 @@
+/*
+*  Publications.jape
+*
+*/
+
+Phase:	Publications
+Input: Split Token Lookup Date Location
+Options: control = appelt debug = true
+
+Macro: PUBLICATION_INTERNAL_LINE_SPLIT
+(
+	(
+		({Split.kind=="P"}) |
+		({Split.kind=="R"}) |
+		({Split.kind=="B"}) |
+		({Split.kind=="N"}) 
+	)?
+	({Split.kind=="external"})
+)
+
+//Rule: PublicationAuthors1
+//Priority: 300
+Macro: PUBLICATION_AUTHORS_1
+(		
+	(SPA_PREPOSITION_LAST_NAME)?	
+	({Token.kind==word,Token.orth==upperInitial,Token.length > 1} | {Token.kind==word,Token.orth==mixedCaps,Token.length > 1}) /* ({Token.category==NN, Token.orth==upperInitial, Token.length > 1} | {Token.category==VB, Token.orth==upperInitial, Token.length > 1} | {Token.category==NNP,Token.orth==upperInitial} | {Token.category==NNP,Token.orth==mixedCaps}) */	
+	(			
+		(
+			(	({Token.string==","})?
+				{Token.orth == upperInitial, Token.length =="1"}
+				({Token.string=="."})?)
+			|
+			(	({Token.string==","})?
+				{Token.orth == allCaps, Token.length == "2"}
+				({Token.string=="."})?)
+			|
+			(	({Token.string==","})?
+				{Token.orth==upperInitial, Token.length > 1}
+			)
+		)		
+	)	
+	(
+		(	({Token.string==","})?
+				{Token.orth == upperInitial, Token.length =="1"}
+				({Token.string=="."})?)
+		|
+		(	({Token.string==","})?
+			{Token.orth == allCaps, Token.length == "2"}
+			({Token.string=="."})?)
+	)?
+	(		
+		({Split.kind==internal})?
+		(
+			({Token.string==","}({Token.string=="&"} | {Token.category==CC})?) | 
+			({Token.string=="."}) | 
+			({Token.string=="&"}) | 
+			({Token.category==CC})
+		 )
+		({Split.kind==internal})?
+		(SPA_PREPOSITION_LAST_NAME)?			
+		({Token.kind==word,Token.orth==upperInitial,Token.length > 1} | {Token.kind==word,Token.orth==mixedCaps,Token.length > 1}) /* ({Token.category==NN, Token.orth==upperInitial, Token.length > 1} | {Token.category==VB, Token.orth==upperInitial, Token.length > 1} | {Token.category==NNP,Token.orth==upperInitial} | {Token.category==NNP,Token.orth==mixedCaps}) */		
+		(			
+			(
+			(	({Token.string==","})?
+				{Token.orth == upperInitial, Token.length =="1"}
+				({Token.string=="."})?)
+			|
+			(	({Token.string==","})?
+				{Token.orth == allCaps, Token.length == "2"}
+				({Token.string=="."})?)
+			|
+			(	({Token.string==","})?
+				{Token.orth==upperInitial, Token.length > 1}
+			)
+			)			
+		)
+		(
+			({Token.string=="&"})?
+			(({Token.string==","})?
+			 {Token.orth == upperInitial, Token.length =="1"}
+			 ({Token.string=="."})?)
+			|
+			(({Token.string==","})?
+			 {Token.orth == allCaps, Token.length == "2"}
+			 ({Token.string=="."})?)
+		)?
+		(
+			(({Token.string==","})?
+			 {Token.orth == upperInitial, Token.length =="1"}
+			 ({Token.string=="."})?)
+		)?
+	)[2,10]		
+	(		
+		({Split.kind==internal})?
+		(
+			(
+				{Token.string==","}
+				({Token.category==CC})
+			) | 
+			(
+				{Token.category==CC}
+			)
+		)
+		({Split.kind==internal})?
+		(SPA_PREPOSITION_LAST_NAME)?			
+		({Token.kind==word,Token.orth==upperInitial,Token.length > 1} | {Token.kind==word,Token.orth==mixedCaps,Token.length > 1}) /* ({Token.category==NN, Token.orth==upperInitial, Token.length > 1} | {Token.category==VB, Token.orth==upperInitial, Token.length > 1} | {Token.category==NNP,Token.orth==upperInitial} | {Token.category==NNP,Token.orth==mixedCaps}) */		
+		(			
+			(
+			(	({Token.string==","})?
+				{Token.orth == upperInitial, Token.length =="1"}
+				({Token.string=="."})?)
+			|
+			(	({Token.string==","})?
+				{Token.orth == allCaps, Token.length == "2"}
+				({Token.string=="."})?)
+			|
+			(	({Token.string==","})?
+				{Token.orth==upperInitial, Token.length > 1}
+			)
+			)			
+		)
+		(
+			({Token.string=="&"})?
+			(({Token.string==","})?
+			 {Token.orth == upperInitial, Token.length =="1"}
+			 ({Token.string=="."})?)
+			|
+			(({Token.string==","})?
+			 {Token.orth == allCaps, Token.length == "2"}
+			 ({Token.string=="."})?)
+		)?
+		(
+			(({Token.string==","})?
+			 {Token.orth == upperInitial, Token.length =="1"}
+			 ({Token.string=="."})?)
+		)?
+	)?
+)
+//:authors
+//-->
+ //:authors.PublicationsAuthors = {rule = "PublicationAuthors1"}
+ 
+/*
+Rule: PublicationAuthors2
+Priority: 300
+(		
+	(SPA_PREPOSITION_LAST_NAME)?	
+	({Token.category==NN, Token.orth==upperInitial, Token.length > 1} | {Token.category==NNP,Token.orth==upperInitial} | {Token.category==NNP,Token.orth==mixedCaps})
+	({Token.string==","})?
+	(			
+		(
+			({Token.orth == upperInitial, Token.length =="1"}
+			 ({Token.string=="."})?)
+			|
+			({Token.orth == allCaps, Token.length == "2"}
+			 ({Token.string=="."})?)
+			|
+			({Token.orth==upperInitial, Token.length > 1})
+		)		
+	)	
+	(
+		({Token.string=="&"})?
+		({Token.orth == upperInitial, Token.length =="1"}
+		 ({Token.string=="."})?)
+		|
+		({Token.orth == allCaps, Token.length == "2"}
+		 ({Token.string=="."})?)
+	)?			
+	({Split.kind==external})?
+	(
+		({Token.string==","})?
+		({Token.string=="&"} | {Token.category==CC})
+	 )		
+	(SPA_PREPOSITION_LAST_NAME)?	
+	({Token.category==NN, Token.orth==upperInitial, Token.length > 1} | {Token.category==NNP,Token.orth==upperInitial} | {Token.category==NNP,Token.orth==mixedCaps})
+	({Token.string==","})?
+	(			
+		(
+			({Token.orth == upperInitial, Token.length =="1"}
+			 ({Token.string=="."})?)
+			|
+			({Token.orth == allCaps, Token.length == "2"}
+			 ({Token.string=="."})?)
+			|
+			({Token.orth==upperInitial, Token.length > 1})
+		)		
+	)	
+	(
+		({Token.string=="&"})?
+		({Token.orth == upperInitial, Token.length =="1"}
+		 ({Token.string=="."})?)
+		|
+		({Token.orth == allCaps, Token.length == "2"}
+		 ({Token.string=="."})?)
+	)?		
+):authors
+-->
+ :authors.PublicationsAuthors = {rule = "PublicationAuthors2"}
+*/
+
+//Rule: PublicationAuthors3
+//Priority: 300
+Macro: PUBLICATION_AUTHORS_2
+(		
+	
+	(			
+		(
+			(	({Token.string==","})?
+				{Token.orth == upperInitial, Token.length =="1"}
+				({Token.string=="."})?)
+			|
+			(	({Token.string==","})?
+				{Token.orth == allCaps, Token.length == "2"}
+				({Token.string=="."})?)
+			|
+			(	({Token.string==","})?
+				({Token.kind==word,Token.orth==upperInitial,Token.length > 1} | {Token.kind==word,Token.orth==mixedCaps,Token.length > 1}) /* ({Token.category==NN, Token.orth==upperInitial, Token.length > 1} | {Token.category==VB, Token.orth==upperInitial, Token.length > 1} | {Token.category==NNP,Token.orth==upperInitial} | {Token.category==NNP,Token.orth==mixedCaps}) */
+				({Token.string==","})
+			)
+		)		
+	)	
+	(
+		(	({Token.string==","})?
+				{Token.orth == upperInitial, Token.length =="1"}
+				({Token.string=="."})?)
+		|
+		(	({Token.string==","})?
+			{Token.orth == allCaps, Token.length == "2"}
+			({Token.string=="."})?)
+	)?
+	(SPA_PREPOSITION_LAST_NAME)?	
+	({Token.kind==word,Token.orth==upperInitial,Token.length > 1} | {Token.kind==word,Token.orth==mixedCaps,Token.length > 1}) /* ({Token.category==NN, Token.orth==upperInitial, Token.length > 1} | {Token.category==VB, Token.orth==upperInitial, Token.length > 1} | {Token.category==NNP,Token.orth==upperInitial} | {Token.category==NNP,Token.orth==mixedCaps}) */
+	(		
+		({Split.kind==internal})?
+		(
+			({Token.string==","}({Token.string=="&"} | {Token.category==CC})?) | 
+			({Token.string=="."}) | 
+			({Token.string=="&"}) | 
+			({Token.category==CC})
+		 )
+		(
+			({Token.string=="P"})?
+			{Split.kind==internal}
+		)?		
+		(			
+			(
+			(	({Token.string==","})?
+				{Token.orth == upperInitial, Token.length =="1"}
+				({Token.string=="."})?)
+			|
+			(	({Token.string==","})?
+				{Token.orth == allCaps, Token.length == "2"}
+				({Token.string=="."})?)
+			|
+			(	({Token.string==","})?
+				({Token.kind==word,Token.orth==upperInitial,Token.length > 1} | {Token.kind==word,Token.orth==mixedCaps,Token.length > 1}) /* ({Token.category==NN, Token.orth==upperInitial, Token.length > 1} | {Token.category==VB, Token.orth==upperInitial, Token.length > 1} | {Token.category==NNP,Token.orth==upperInitial} | {Token.category==NNP,Token.orth==mixedCaps}) */
+			)
+			)			
+		)
+		(
+			({Token.string=="&"})?
+			(({Token.string==","})?
+			 {Token.orth == upperInitial, Token.length =="1"}
+			 ({Token.string=="."})?)
+			|
+			(({Token.string==","})?
+			 {Token.orth == allCaps, Token.length == "2"}
+			 ({Token.string=="."})?)
+		)?
+		(
+			(({Token.string==","})?
+			 {Token.orth == upperInitial, Token.length =="1"}
+			 ({Token.string=="."})?)
+		)?
+		(SPA_PREPOSITION_LAST_NAME)?			
+		({Token.kind==word,Token.orth==upperInitial,Token.length > 1} | {Token.kind==word,Token.orth==mixedCaps,Token.length > 1}) /* ({Token.category==NN, Token.orth==upperInitial, Token.length > 1} | {Token.category==VB, Token.orth==upperInitial, Token.length > 1} | {Token.category==NNP,Token.orth==upperInitial} | {Token.category==NNP,Token.orth==mixedCaps}) */		
+	)[2,10]			
+)
+//:authors
+//-->
+ //:authors.PublicationsAuthors = {rule = "PublicationAuthors3"}
+
+Rule: Publication1
+Priority: 600
+(	
+	(
+		({Token.string=="."}) |
+		({Token.string=="•"})
+	)
+	(
+		(
+			({Token.position=="startpunct"}) |
+			({Token.position=="endpunct"}) |
+			({Token.subkind=="dashpunct"}) |
+			({Token.kind=="number"}) |
+			({Token.kind==":"}) |
+			({Token.kind==word}) |
+			(
+				({Split.kind == internal})
+				({Token})
+			) 
+		)[3,30]
+	) : name
+	({Split.kind==external})?
+	(	
+		{Token.string=="."}
+	)?
+	({Split.kind==external})?
+	((PUBLICATION_AUTHORS_1) | (PUBLICATION_AUTHORS_2)) : authors
+):exp
+-->
+{	
+	gate.FeatureMap features = Factory.newFeatureMap();
+	
+	gate.AnnotationSet exp = (gate.AnnotationSet)bindings.get("exp");
+	gate.AnnotationSet varAuthors = (gate.AnnotationSet)bindings.get("authors");
+	gate.AnnotationSet varName = (gate.AnnotationSet)bindings.get("name");	
+	
+	features.put("authors", gate.Utils.stringFor(doc, varAuthors));
+	features.put("name", gate.Utils.stringFor(doc, varName));
+	
+	features.put("rule", "Publication1");	
+
+	outputAS.add(exp.firstNode(), exp.lastNode(), "Publication", features);	
+}
+
+Rule: Publication2
+Priority: 600
+(	
+	(
+		({Token.string=="."}) |
+		({Token.string=="•"})
+	)?
+	((PUBLICATION_AUTHORS_1) | (PUBLICATION_AUTHORS_2)) : authors
+	({Split.kind==external})?
+	({Token.string=="."})?
+	(
+		{Token.root=="("}
+		{Date}
+		{Token.root==")"}
+	)?
+	({Token.string=="."})?
+	({Split.kind==external})?
+	(
+		(
+			(
+				({Token.position=="startpunct"}) |
+				({Token.position=="endpunct"}) |
+				({Token.subkind=="dashpunct"}) |
+				({Token.kind=="number"}) |
+				({Token.kind==":"}) |
+				({Token.kind==word}) |
+				/*(
+					({Split.kind == internal})
+					({Token})
+				) | */
+				({Token.string==","}) |
+				({Token.string==":"})
+			)
+			({Split.kind=="external"})?
+		)[3,30]
+	) : name	
+):exp
+-->
+{	
+	gate.FeatureMap features = Factory.newFeatureMap();
+	
+	gate.AnnotationSet exp = (gate.AnnotationSet)bindings.get("exp");
+	gate.AnnotationSet varAuthors = (gate.AnnotationSet)bindings.get("authors");
+	gate.AnnotationSet varName = (gate.AnnotationSet)bindings.get("name");	
+	
+	features.put("authors", gate.Utils.stringFor(doc, varAuthors));
+	features.put("name", gate.Utils.stringFor(doc, varName));
+	
+	features.put("rule", "Publication2");	
+
+	outputAS.add(exp.firstNode(), exp.lastNode(), "Publication", features);	
+}
+
+Rule: Authors
+Priority: 600
+(		
+	((PUBLICATION_AUTHORS_1) | (PUBLICATION_AUTHORS_2))	
+):exp
+-->
+{	
+	gate.FeatureMap features = Factory.newFeatureMap();
+	
+	gate.AnnotationSet exp = (gate.AnnotationSet)bindings.get("exp");	
+	
+	features.put("rule", "Publication2");	
+
+	outputAS.add(exp.firstNode(), exp.lastNode(), "Authors", features);	
+}	

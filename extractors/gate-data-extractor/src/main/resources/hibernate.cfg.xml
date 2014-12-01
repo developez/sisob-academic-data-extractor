@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+  <session-factory>
+    <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+    <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+    <property name="hibernate.connection.url">jdbc:mysql://localhost/sisob_dev</property>
+    <!--    
+    <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/sisob_dev</property>
+    <property name="hibernate.connection.username">sisob_dev</property>
+    <property name="hibernate.connection.password">1234</property>
+    -->
+    <property name="hibernate.connection.username">sisob_dev</property>
+    <property name="hibernate.connection.password">1234</property>
+    
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnAgency"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnAuthor"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnCitation"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnCity"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnConference"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnConferenceResearcher"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnCountry"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnDegreeType"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnEmploymentBreak"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnEntity"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnEntityType"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnInstitution"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnKnowledge"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnKnowledgeItem"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnKnowledgeList"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnLanguage"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnNationality"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnPaper"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnPaperAuthor"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnPaperAuthorExtraData"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnPaperInstitution"/>    
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnPatent"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnPatentResearcher"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnProfActivity"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnProfActivityType"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnProject"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnProjectResearcher"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnRegion"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnResearcher"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnStay"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnSupervision"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnTeaching"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnUniversityStudy"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnUniversityStudyName"/>
+    <mapping class="eu.sisob.api.crudlogichibernate.pojos.CvnUniversityStudyType"/>
+  </session-factory>
+</hibernate-configuration>

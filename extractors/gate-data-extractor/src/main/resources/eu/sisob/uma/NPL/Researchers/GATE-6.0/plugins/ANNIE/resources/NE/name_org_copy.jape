@@ -1,0 +1,683 @@
+Phase:	Name_Org
+Input: Token Lookup Title FirstPerson TempDate Split
+Options: control = appelt debug = false
+
+///////////////////////////////////////////////////////////////////
+// Organisation Rules
+
+Macro:  CDG
+// cdg is something like "Ltd."
+ (
+  ({Lookup.majorType == cdg})|
+  ({Token.string == ","} 
+  {Lookup.majorType == cdg})
+ )
+
+
+Macro: SAINT
+(
+ ({Token.string == "St"} ({Token.string == "."})? |
+ {Token.string == "Saint"})
+)
+
+Macro: CHURCH
+(
+{Token.string == "Church"}|{Token.string == "church"}|
+{Token.string == "Cathedral"}|{Token.string == "cathedral"}|
+{Token.string == "Chapel"}|{Token.string == "chapel"}
+)
+
+/////////////////////////////////////////////////////////////
+Rule:	TheGazOrganization
+Priority: 245
+(
+ {Token.category == DT}|
+ {Token.category == RB}
+)
+(
+{Lookup.majorType == organization}
+)
+:orgName -->  
+ {
+ gate.FeatureMap features = Factory.newFeatureMap();
+// create an annotation set consisting of all the annotations for org 
+gate.AnnotationSet orgSet = (gate.AnnotationSet)bindings.get("orgName");
+// create an annotation set consisting of the annotation matching Lookup
+gate.AnnotationSet org = (gate.AnnotationSet)orgSet.get("Lookup");
+// if the annotation type Lookup doesn't exist, do nothing
+if (org != null && org.size()>0)
+{
+// if it does exist, take the first element in the set
+  gate.Annotation orgAnn = (gate.Annotation)org.iterator().next();
+//propagate minorType feature (and value) from org
+  features.put("orgType", orgAnn.getFeatures().get("minorType"));
+}
+// create some new features
+  features.put("rule", "GazOrganization");
+// create a TempOrg annotation and add the features we've created
+outputAS.add(orgSet.firstNode(), orgSet.lastNode(), "TempOrganization",
+features);
+}
+
+
+Rule:	GazOrganization
+Priority: 145
+(
+{Lookup.majorType == organization}
+)
+:orgName -->  
+ {
+ gate.FeatureMap features = Factory.newFeatureMap();
+// create an annotation set consisting of all the annotations for org 
+gate.AnnotationSet orgSet = (gate.AnnotationSet)bindings.get("orgName");
+// create an annotation set consisting of the annotation matching Lookup
+gate.AnnotationSet org = (gate.AnnotationSet)orgSet.get("Lookup");
+// if the annotation type Lookup doesn't exist, do nothing
+if (org != null && org.size()>0)
+{
+// if it does exist, take the first element in the set
+  gate.Annotation orgAnn = (gate.Annotation)org.iterator().next();
+//propagate minorType feature (and value) from org
+  features.put("orgType", orgAnn.getFeatures().get("minorType"));
+}
+// create some new features
+  features.put("rule", "GazOrganization");
+// create a TempOrg annotation and add the features we've created
+outputAS.add(orgSet.firstNode(), orgSet.lastNode(), "TempOrganization",
+features);
+}
+
+Rule:	LocOrganization
+Priority: 50
+// Ealing Police
+(
+ ({Lookup.majorType == location} |
+  {Lookup.majorType == country_adj})
+{Lookup.majorType == organization}
+({Lookup.majorType == organization})?
+)
+:orgName -->  
+  :orgName.TempOrganization = {kind = "orgName", rule=LocOrganization}
+
+
+Rule:	INOrgXandY
+Priority: 200
+
+// Bradford & Bingley
+// Bradford & Bingley Ltd
+
+(
+ ({Token.category == NNP}
+  )+
+
+ {Token.string == "&"}
+
+ (
+  {Token.orth == upperInitial}
+ )+
+
+ (CDG)?
+
+)
+:orgName -->
+  :orgName.TempOrganization = {kind = "unknown", rule = "OrgXandY"}
+
+Rule:	OrgXandY
+Priority: 20
+
+// Bradford & Bingley
+// Bradford & Bingley Ltd
+
+
+(
+ ({Token.category == NNP}
+  )+
+
+ {Token.string == "&"}
+
+ (
+  {Token.orth == upperInitial}
+ )+
+
+ (CDG)?
+
+)
+:orgName -->
+  :orgName.TempOrganization = {kind = "unknown", rule = "OrgXandY"}
+
+
+Rule:OrgUni
+Priority: 170
+// University of Sheffield
+// Sheffield University
+// A Sheffield University
+(
+	({Lookup.minorType == university}) |
+	(	
+		(			
+			{Lookup.majorType == org_base_uni}
+		)
+		{Token.string == "of"}
+		(
+			{Token.category == NNP}
+		)+
+	) |
+	(
+		({Token.orth == upperInitial, Lookup.majorType != academic_disciplines} | {Token.orth == mixedCaps, Lookup.majorType != academic_disciplines})+				
+		(			
+			{Lookup.majorType == org_base_uni}
+		)
+		(
+			{Token.string == "of"}		
+			({Lookup.majorType == academic_disciplines})+
+		)?
+	)	
+)
+:orgName -->
+  :orgName.TempOrganization = {kind = "university", rule = "OrgUni", orgType = university }  
+  
+Rule:OrgUni2
+Priority: 170
+// UMIST
+(
+	({Token.orth == allCaps, Token.string =~ "U"})
+)
+:orgName -->
+  :orgName.TempOrganization = {kind = "university", rule = "OrgUni2", orgType = university }  
+  
+  /*
+Rule:OrgUni1
+Priority: 150
+// University of Sheffield
+// Sheffield University
+// A Sheffield University
+(	
+	(
+		({Lookup.majorType == location} | {Token.orth == upperInitial})+		
+		(			
+			{Lookup.majorType == org_base_uni}
+		)		
+	)	
+)
+:orgName -->
+  :orgName.TempOrganization = {kind = "university", rule = "OrgUni", orgType = university }  
+  */
+  
+Rule: OrgSchool
+Priority: 170
+// school of Pure Mathematics and Physics
+
+(
+	(		
+		 {Lookup.majorType == org_base_school}
+
+		 {Token.string == "of"}
+		 (
+		 {Lookup.majorType == academic_disciplines})+
+		 (
+		  {Token.string == "and"}
+		  ( 
+		   {Token.category == NNP} | {Token.category == NNPS} | {Token.category == JJ} | {Lookup.majorType == academic_disciplines})+
+		 )?
+	) | 
+	(		
+		 {Lookup.majorType == org_base_school}
+		 {Token.string == "of"}
+		 (
+		 {Token.orth == upperInitial})+
+		 (
+		  {Token.string == "and"}
+		  ( 
+		   {Token.orth == upperInitial})+
+		 )?
+	) |
+	(			
+		({Token.orth == upperInitial})+				
+		{Lookup.majorType == org_base_school}
+		(
+			{Token.string == "of"}
+			({Lookup.majorType == academic_disciplines})+
+			(
+				{Token.string == "and"}
+				({Token.category == JJ} | {Lookup.majorType == academic_disciplines})+
+			)?
+		)?
+	) |
+	(		
+		
+		(
+			{Token.orth == upperInitial}
+			({Token.category == "."})?
+		)[1,2]
+		{Token.orth == apostrophe}		
+		{Lookup.majorType == org_base_school}
+	)
+)
+:orgName -->
+  :orgName.TempOrganization = {kind = "school", rule = "OrgSchool", orgType = school } 
+  
+  
+Rule: OrgDept
+Priority: 180
+// Department of Pure Mathematics and Physics
+
+(
+	(		
+		 {Lookup.majorType == org_base_dept}
+		 {Token.string == "of"}
+		 (
+		 {Lookup.majorType == academic_disciplines})+
+		 (
+		  {Token.string == "and"}
+		  ( 
+		   {Token.category == NNP} | {Token.category == NNPS} | {Token.category == JJ} | {Lookup.majorType == academic_disciplines})+
+		 )?
+	) | 
+	(		
+		{Lookup.majorType == org_base_dept}
+		{Token.string == "of"}
+		(
+		{Token.orth == upperInitial})+
+		(
+		 {Token.string == "and"}
+		 ( 
+		  {Token.orth == upperInitial})+
+		)?
+	) |
+	(
+		({Lookup.majorType == academic_disciplines} | {Token.orth == upperInitial})+
+		{Lookup.majorType == org_base_dept}	
+	)	
+)
+:orgName -->
+  :orgName.TempOrganization = {kind = "department", rule = "OrgDept", orgType = dept }
+
+ 
+Rule:	TheOrgXKey
+Priority: 500
+
+// The Aaaa Ltd.
+(
+ {Token.category == DT}
+)
+(
+  (UPPER)
+  (UPPER)?
+  (UPPER)?
+  (UPPER)?
+  (UPPER)?
+ {Lookup.majorType == org_key}
+ ({Lookup.majorType == org_ending})?
+)
+:org
+-->
+:org.TempOrganization = {kind = "unknown", rule = "TheOrgXKey"}
+
+Rule: NotOrgXKey
+Priority: 150
+// if all the names are org_base or org_key, it's not an organisation
+// e.g. Business Consulting
+
+(
+ ({Lookup.majorType == org_key}|
+  {Lookup.majorType == org_base}
+ )+
+ ({Lookup.majorType == org_ending})?
+)
+:org
+-->
+{}
+
+
+Rule:	OrgXKey
+Priority: 125
+
+// Aaaa Ltd.
+(
+  (UPPER)
+  (UPPER)?
+  (UPPER)?
+  (UPPER)?
+  (UPPER)?
+ {Lookup.majorType == org_key}
+ ({Lookup.majorType == org_ending})?
+)
+:org
+-->
+:org.TempOrganization = {kind = "unknown", rule = "OrgXKey"}
+
+
+Rule: NotOrgXEnding
+Priority: 500
+// Very Limited
+
+(
+ {Token.category == DT}
+)?
+(
+ {Token.category == RB}
+ {Lookup.majorType == cdg}
+)
+:label
+-->
+{}
+ 
+ Rule:	NotOrgXEnding2
+Priority: 500
+
+// The Coca Cola Co.
+
+(
+ {Token.category == DT}
+)
+(
+  (UPPER)
+  (UPPER)?
+ {Lookup.majorType == cdg}
+)
+:orgName -->
+  :orgName.TempOrganization = {kind = "unknown", rule = "OrgXEnding"}
+
+
+
+Rule:	OrgXEnding
+Priority: 120
+
+// Coca Cola Co.
+
+(
+  (UPPER)
+  (UPPER)?
+ {Lookup.majorType == cdg}
+)
+:orgName -->
+  :orgName.TempOrganization = {kind = "unknown", rule = "OrgXEnding"}
+
+Rule:	TheOrgXandYKey
+Priority: 220
+
+(
+ {Token.category == DT}
+)
+(
+ (UPPER)
+ (UPPER)?
+  (({Token.string == "and"} | 
+    {Token.string == "&"})
+   (UPPER)?
+   (UPPER)?
+   (UPPER)?
+  )
+ {Lookup.majorType == org_key}
+ ({Lookup.majorType == org_ending})?
+)
+:orgName -->
+  :orgName.TempOrganization = {kind = "unknown", rule = "OrgXandYKey"}
+
+
+
+Rule:	OrgXandYKey
+Priority: 120
+
+// Aaaa Ltd.
+// Xxx Services Ltd. 
+// AA and BB Services Ltd.
+// but NOT A XXX Services Ltd.
+
+(
+ (UPPER)
+ (UPPER)?
+  (({Token.string == "and"} | 
+    {Token.string == "&"})
+   (UPPER)?
+   (UPPER)?
+   (UPPER)?
+  )
+ {Lookup.majorType == org_key}
+ ({Lookup.majorType == org_ending})?
+)
+:orgName -->
+  :orgName.TempOrganization = {kind = "unknown", rule = "OrgXandYKey"}
+
+
+Rule:	OrgXsKeyBase
+Priority: 120
+ 
+// Gandy's Circus
+// Queen's Ware
+
+(
+  (UPPER)?
+  (UPPER)?
+  ({Token.orth == upperInitial}
+   {Token.string == "'"}
+   ({Token.string == "s"})?
+  )
+ ({Lookup.majorType == org_key}|
+  {Lookup.majorType == org_base})
+)
+:orgName -->
+  :orgName.TempOrganization = {kind = "org", rule = "OrgXsKeybase"}
+
+
+
+Rule: NotOrgXBase
+Priority: 1000
+// not things like British National
+// or The University
+
+
+(
+ ({Token.category == DT}
+ )?
+)
+(
+ ({Lookup.majorType == country_adj}|
+  {Token.orth == lowercase})
+ ({Lookup.majorType == org_base}|
+  {Lookup.majorType == govern_key})
+)
+:orgName -->
+  :orgName.Temp = {kind = "notorgName", rule = "NotOrgXBase"}
+
+
+Rule:	TheOrgXBase
+Priority: 230
+
+(
+ ({Token.category == DT}
+ )
+)
+(
+ (
+  (UPPER)|
+  {Lookup.majorType == organization}
+ )
+ (UPPER)?
+ (UPPER)?
+ ({Lookup.majorType == org_base}|
+  {Lookup.majorType == govern_key}
+ )
+ (
+  ({Token.string == "of"} | {Token.string == "for"})
+  (UPPER)
+  (
+	(
+		{Token.string == "and"}
+		(UPPER)
+	) |
+	(UPPER)	
+  )?
+  (
+	(
+		{Token.string == "and"}
+		(UPPER)
+	) |
+	(UPPER)	
+  )?  
+ )?
+)
+:orgName -->
+  :orgName.TempOrganization = {kind = "unknown", rule = "TheOrgXBase"}
+
+  
+Rule:	OrgXBase
+Priority: 130
+
+// same as OrgXKey but uses base instead of key
+// includes govern_key e.g. academy
+// Barclays Bank
+// Royal Academy of Art
+
+(
+ (
+  (UPPER)|
+  {Lookup.majorType == organization}
+ )
+ (UPPER)?
+ (UPPER)?
+ ({Lookup.majorType == org_base}|
+  {Lookup.majorType == govern_key}
+ )
+ (
+  ({Token.string == "of"} | {Token.string == "for"})  
+  (UPPER)
+  (  
+	(
+		{Token.string == "and"}
+		(UPPER)
+	) |
+	(UPPER)	
+  )?
+  (
+	(
+		{Token.string == "and"}
+		(UPPER)
+	) |
+	(UPPER)	
+  )?  
+ )?
+)
+:orgName -->
+  :orgName.TempOrganization = {kind = "unknown", rule = "OrgXBase"}
+
+Rule:	TheBaseofOrg
+Priority: 230
+
+(
+ {Token.category == DT} | {Token.category == IN}
+)
+(
+ ({Lookup.majorType == org_base}|
+  {Lookup.majorType == govern_key}
+ )
+ 
+ {Token.string == "of"}
+ ( 
+  {Token.category == DT}
+ )?
+ (UPPER)
+ (UPPER)?
+)
+:orgName -->
+  :orgName.TempOrganization = {kind = "unknown", rule = "BaseofOrg"}
+
+
+
+
+Rule:	BaseofOrg
+Priority: 130
+
+(
+ ({Lookup.majorType == org_base}|
+  {Lookup.majorType == govern_key}
+ )
+ 
+ {Token.string == "of"}
+ ( 
+  {Token.category == DT}
+ )?
+ (UPPER)
+ (UPPER)?
+)
+:orgName -->
+  :orgName.TempOrganization = {kind = "unknown", rule = "BaseofOrg"}
+  
+  Rule:	BaseofOrg2
+Priority: 130
+
+(
+ ({Lookup.majorType == org_base}|
+  {Lookup.majorType == govern_key}
+ )
+ 
+ {Token.string == "of"}
+ (
+  {Token.category == DT}
+ )?
+ (
+ (UPPER))
+ (
+ (UPPER))?
+)
+:orgName -->
+  :orgName.TempOrganization = {kind = "unknown", rule = "BaseofOrg"}
+
+  
+Rule:	BaseofOrg3
+Priority: 130
+
+(
+	{Token.category == NNP}
+    {Token.category == POS}             
+	{Lookup.majorType == org_base}
+)
+:orgName -->
+  :orgName.TempOrganization = {kind = "unknown", rule = "BaseofOrg"} 
+  
+
+Rule:	OrgPreX
+Priority: 130
+
+// Royal Tuscan
+
+(
+ {Lookup.majorType == org_pre}
+ (
+  {Token.orth == upperInitial})+
+ ({Lookup.majorType == org_ending})?
+)
+:orgName -->
+  :orgName.TempOrganization = {kind = "unknown", rule = "OrgPreX"}
+
+
+
+
+Rule: OrgChurch
+Priority: 150
+// St. Andrew's Church
+
+(
+  (SAINT)
+  {Token.orth == upperInitial}
+  {Token.string == "'"}({Token.string == "s"})?
+  (CHURCH)
+)
+:orgName -->
+  :orgName.TempOrganization = {kind = "org", rule = "OrgChurch"}
+
+
+Rule:OrgPersonAmbig
+Priority: 130
+// Alexandra Pottery should be org not person
+// overrides PersonFull
+
+(
+ (FIRSTNAME)
+ ({Lookup.majorType == org_key}|
+  {Lookup.majorType == org_base})
+ ({Lookup.majorType == org_ending})?
+)
+:org 
+-->
+ :org.TempOrganization= {kind = "unknown", rule = "OrgPersonAmbig"}
