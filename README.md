@@ -12,18 +12,18 @@ INFORMATION AND INSTRUCTIONS
 
 Index:
 
-	1. Information of the project
-	2. Directory structure of the project
-	3. Instructions to build and install the SISOB Data Extractor
+1. Information of the project
+2. Directory structure of the project
+3. Instructions to build and install the SISOB Data Extractor
 		
 1. Information of the project
 -----------------------------
 
-	All the information of the SISOB Data Extractor is here: 
+All the information of the SISOB Data Extractor is here: 
 	
-	- http://sisob.lcc.uma.es/dataextractor 
+- http://sisob.lcc.uma.es/dataextractor 
 	
-	But in few words, with this tool you can extract information from researchers CVs in english like the professional activities, university studies, publications and the personal information. Also, you can try to search public researchers CV file using commercial web searchers or using a crawler providing the main url of the university web site of the researchers to search.
+But in few words, with this tool you can extract information from researchers CVs in english like the professional activities, university studies, publications and the personal information. Also, you can try to search public researchers CV file using commercial web searchers or using a crawler providing the main url of the university web site of the researchers to search.
 
 2. Directory structure of the project
 -------------------------------------
