@@ -3,7 +3,7 @@ ACADEMIC DATA EXTRACTOR
 
 This project is a fork of SISOB DATA EXTRACTOR, one of the results of the SISOB project (http://sisob.lcc.uma.es). The SISOB project was supported by the European Commission, call FP7-SCIENCE-IN-SOCIETY-2010-1, as a Collaborative Project under the 7th Framework Program, Grant agreement number 266588. SISOB Data Extractor has been development by the (IA)2 Research Group (http://iaia.lcc.uma.es) at the University of Málaga (Spain) (http://www.uma.es) in collaboration with the Fondazione Roselli (http://www.personalweb.unito.it/aldo.geuna/).
 
-I was working this project under SISOB project as developer.
+I was working on this project under SISOB project as developer.
 
 INFORMATION AND INSTRUCTIONS
 ============================
